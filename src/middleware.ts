@@ -31,9 +31,10 @@ function getIP(request: NextRequest): string {
 // ─── Rate Limit Config ────────────────────────────────────────────────────────
 const HOUR_MS = 60 * 60 * 1000;
 
-// POST /api/v1/inquiries — 5 per hour per IP
-const INQUIRY_RATE_LIMIT = 5;
-// POST /api/v1/auth/login — 10 per hour per IP
+// POST /api/v1/inquiries — configurable via env, default 10/hr/IP
+// Change in Vercel Dashboard → Settings → Environment Variables → INQUIRY_RATE_LIMIT
+const INQUIRY_RATE_LIMIT = Number(process.env.INQUIRY_RATE_LIMIT) || 10;
+// POST /api/v1/auth/login — hardcoded 10/hr/IP (security-critical, don't expose to env)
 const LOGIN_RATE_LIMIT = 10;
 
 // ─── Route Matchers ───────────────────────────────────────────────────────────

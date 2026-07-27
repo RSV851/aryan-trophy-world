@@ -14,85 +14,86 @@ export default async function HomePage() {
 
   const phone = profile?.phone || settings?.contact_phone || '+91 98765 43210';
 
-  // 8 Bestsellers featuring verified real trophy & award photos from Unsplash
+  // 8 Bestsellers featuring local trophy photo assets
   const defaultBestsellers = [
     {
-      id: '1',
+      id: 'default-1',
       slug: 'champion-gold-cup',
       name: 'Champion Gold Cup',
       sku: 'AT-C01',
       priceRange: '₹18,499 ($249)',
       categoryName: 'Polished Metal & Mahogany',
-      imageUrl: 'https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=800&auto=format&fit=crop&q=80',
+      imageUrl: '/images/trophies/gold-cup.jpg',
     },
     {
-      id: '2',
+      id: 'default-2',
       slug: 'golden-foot-award',
       name: 'Golden Foot Sports Award',
       sku: 'AT-S02',
       priceRange: '₹9,499 ($125)',
       categoryName: 'Professional Sports Series',
-      imageUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&auto=format&fit=crop&q=80',
+      imageUrl: '/images/trophies/golden-foot.jpg',
     },
     {
-      id: '3',
+      id: 'default-3',
       slug: 'crystal-pinnacle',
       name: 'Crystal Pinnacle Star',
       sku: 'AT-CP03',
       priceRange: '₹22,999 ($310)',
       categoryName: 'Optical K9 Crystal',
-      imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80',
+      imageUrl: '/images/trophies/crystal-star.jpg',
     },
     {
-      id: '4',
+      id: 'default-4',
       slug: 'radiant-shield',
       name: 'Radiant Victory Shield',
       sku: 'AT-RS04',
       priceRange: '₹14,299 ($189)',
       categoryName: 'Traditional Team Honors',
-      imageUrl: 'https://images.unsplash.com/photo-1569517282132-25d22f4573e6?w=800&auto=format&fit=crop&q=80',
+      imageUrl: '/images/trophies/victory-shield.jpg',
     },
     {
-      id: '5',
+      id: 'default-5',
       slug: 'gold-star-trophy',
       name: 'Leadership Gold Star Trophy',
       sku: 'AT-GS05',
       priceRange: '₹12,999 ($165)',
       categoryName: 'Executive Excellence',
-      imageUrl: 'https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=800&auto=format&fit=crop&q=80',
+      imageUrl: '/images/trophies/gold-star.jpg',
     },
     {
-      id: '6',
+      id: 'default-6',
       slug: 'olympic-victory-medal',
       name: 'Olympic Championship Medal',
       sku: 'AT-M06',
       priceRange: '₹4,999 ($65)',
       categoryName: 'Solid Brass & Cast Gold',
-      imageUrl: 'https://images.unsplash.com/photo-1589487391730-58f20eb2c308?w=800&auto=format&fit=crop&q=80',
+      imageUrl: '/images/trophies/victory-medal.jpg',
     },
     {
-      id: '7',
+      id: 'default-7',
       slug: 'corporate-glass-plaque',
       name: 'Corporate Glass Plaque',
       sku: 'AT-GP07',
       priceRange: '₹16,499 ($215)',
       categoryName: 'Laser-Engraved Crystal',
-      imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80',
+      imageUrl: '/images/trophies/glass-plaque.jpg',
     },
     {
-      id: '8',
+      id: 'default-8',
       slug: 'mahogany-honor-wooden',
       name: 'Mahogany Honor Plaque',
       sku: 'AT-MP08',
       priceRange: '₹11,499 ($149)',
       categoryName: 'Rosewood & Brass Casing',
-      imageUrl: 'https://images.unsplash.com/photo-1569517282132-25d22f4573e6?w=800&auto=format&fit=crop&q=80',
+      imageUrl: '/images/trophies/mahogany-plaque.jpg',
     },
   ];
 
-  const displayProducts = featuredProducts?.products && featuredProducts.products.length > 0 
-    ? featuredProducts.products.slice(0, 8) 
-    : defaultBestsellers;
+  const dbProducts = featuredProducts?.products || [];
+  const displayProducts = dbProducts.length >= 8 
+    ? dbProducts.slice(0, 8) 
+    : [...dbProducts, ...defaultBestsellers.slice(dbProducts.length, 8)];
 
   return (
     <div className="w-full bg-black text-[#e5e2e1]">

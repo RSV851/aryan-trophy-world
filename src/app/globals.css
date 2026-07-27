@@ -5,22 +5,39 @@
 @custom-variant dark (&:is(.dark *));
 
 /* ==============================================================================
-   🌟 TAILWIND V4 GLOBAL THEME ENGINE (FONT & COLOR MAPPING)
-   ==============================================================================
-   This section connects our simple HEX codes and Google Fonts directly into Tailwind!
-   - Classes like `font-sans`, `font-serif`, `font-mono` use the custom fonts below.
-   - Classes like `text-gold`, `bg-navy`, `border-obsidian` use the brand hex values below.
-   - We even map explicit colors like `#C5A55A` and `#111827` to our variables! This means
-     changing the variables in `:root` will alter EVERY screen and component across both
-     the Public Catalog Website and Executive Admin CMS instantaneously!
+   🌟 TAILWIND V4 GLOBAL THEME ENGINE & STITCH ATELIER DESIGN SYSTEM
    ============================================================================== */
 @theme inline {
   /* Font Family Tokens */
-  --font-sans: var(--font-body, sans-serif);
-  --font-serif: var(--font-heading, serif);
-  --font-display: var(--font-heading, serif);
+  --font-sans: var(--font-body, "Inter", sans-serif);
+  --font-serif: var(--font-heading, "Libre Caslon Text", serif);
+  --font-display: var(--font-heading, "Libre Caslon Text", serif);
+  --font-display-lg: var(--font-heading, "Libre Caslon Text", serif);
+  --font-body-lg: var(--font-body, "Inter", sans-serif);
+  --font-body-md: var(--font-body, "Inter", sans-serif);
+  --font-label-md: var(--font-body, "Inter", sans-serif);
   --font-mono: var(--font-mono, monospace);
-  --font-heading: var(--font-heading, serif);
+  --font-heading: var(--font-heading, "Libre Caslon Text", serif);
+
+  /* Stitch Atelier Première Brand Colors */
+  --color-brand-gold: #f2ca50;
+  --color-brand-gold-dark: #d4af37;
+  --color-brand-blue: #2563eb;
+  --color-brand-blue-hover: #1d4ed8;
+  --color-brand-dark: #000000;
+  --color-brand-surface-dim: #131313;
+  --color-brand-surface-bright: #3a3939;
+
+  /* Stitch AURA Catalog Colors */
+  --color-surface: #131313;
+  --color-surface-dim: #131313;
+  --color-surface-bright: #3a3939;
+  --color-surface-container: #201f1f;
+  --color-surface-container-lowest: #0e0e0e;
+  --color-on-surface: #e5e2e1;
+  --color-on-surface-variant: #d0c5af;
+  --color-outline-variant: #4d4635;
+  --color-primary-container: #d4af37;
 
   /* Brand Theme Custom Color Tokens & Dynamic Overrides */
   --color-gold: var(--gold);
@@ -28,12 +45,6 @@
   --color-navy: var(--navy);
   --color-obsidian: var(--obsidian);
   --color-bg-dark: var(--bg-dark);
-
-  /* Automatic interception of hardcoded colors to allow central editing */
-  --color-[#C5A55A]: var(--gold);
-  --color-[#111827]: var(--obsidian);
-  --color-[#1A1F36]: var(--navy);
-  --color-[#090909]: var(--bg-dark);
 
   /* Core UI Tokens */
   --color-background: var(--background);
@@ -46,11 +57,6 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
-  --color-chart-5: var(--chart-5);
-  --color-chart-4: var(--chart-4);
-  --color-chart-3: var(--chart-3);
-  --color-chart-2: var(--chart-2);
-  --color-chart-1: var(--chart-1);
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -79,79 +85,117 @@
 }
 
 /* ==============================================================================
-   🎨 MASTER COLOR PALETTE — MODIFY THESE HEX CODES TO RECOLOR THE SITE!
+   🎨 MASTER COLOR PALETTE — CENTRALIZED VARIABLES
    ============================================================================== */
-:root {
-  /* Brand Master Colors */
-  --gold: #C5A55A;             /* Primary Gold Accent (Trophies, Buttons, Badges) */
-  --gold-hover: #D5B568;       /* Hover Gold Shade */
-  --navy: #1A1F36;             /* Deep Navy Blue (Public Catalog Hero & Highlights) */
-  --obsidian: #111827;         /* Dark Obsidian (Admin CMS Panels & Cards) */
-  --bg-dark: #090909;          /* Deepest Black-Amber Background */
+:root, .dark {
+  --gold: #f2ca50;
+  --gold-hover: #d4af37;
+  --navy: #2563eb;
+  --obsidian: #131313;
+  --bg-dark: #000000;
 
-  /* Light Theme / Public Site Default Surface Colors */
-  --background: #FFFFFF;
-  --foreground: #111827;
-  --card: #FFFFFF;
-  --card-foreground: #111827;
-  --popover: #FFFFFF;
-  --popover-foreground: #111827;
-  --primary: #C5A55A;
-  --primary-foreground: #090909;
-  --secondary: #F3F4F6;
-  --secondary-foreground: #111827;
-  --muted: #F3F4F6;
-  --muted-foreground: #6B7280;
-  --accent: #F3F4F6;
-  --accent-foreground: #111827;
-  --destructive: #EF4444;
-  --border: #E5E7EB;
-  --input: #E5E7EB;
-  --ring: #C5A55A;
-  --radius: 0.625rem;
-
-  /* Sidebar Tokens */
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #111827;
-  --sidebar-primary: #C5A55A;
-  --sidebar-primary-foreground: #090909;
-  --sidebar-accent: #F3F4F6;
-  --sidebar-accent-foreground: #111827;
-  --sidebar-border: #E5E7EB;
-  --sidebar-ring: #C5A55A;
-}
-
-/* Dark Theme / Admin Portal & Dark Mode Surface Colors */
-.dark {
-  --background: #090909;
-  --foreground: #F9FAFB;
-  --card: #111827;
-  --card-foreground: #F9FAFB;
-  --popover: #111827;
-  --popover-foreground: #F9FAFB;
-  --primary: #C5A55A;
-  --primary-foreground: #090909;
-  --secondary: #1F2937;
-  --secondary-foreground: #F9FAFB;
-  --muted: #1F2937;
-  --muted-foreground: #9CA3AF;
-  --accent: #1F2937;
-  --accent-foreground: #F9FAFB;
+  --background: #000000;
+  --foreground: #e5e2e1;
+  --card: #131313;
+  --card-foreground: #e5e2e1;
+  --popover: #131313;
+  --popover-foreground: #e5e2e1;
+  --primary: #f2ca50;
+  --primary-foreground: #000000;
+  --secondary: #201f1f;
+  --secondary-foreground: #e5e2e1;
+  --muted: #201f1f;
+  --muted-foreground: #d0c5af;
+  --accent: #201f1f;
+  --accent-foreground: #e5e2e1;
   --destructive: #F87171;
-  --border: #1F2937;
-  --input: #1F2937;
-  --ring: #C5A55A;
-  --sidebar: #111827;
-  --sidebar-foreground: #F9FAFB;
-  --sidebar-primary: #C5A55A;
-  --sidebar-primary-foreground: #090909;
-  --sidebar-accent: #1F2937;
-  --sidebar-accent-foreground: #F9FAFB;
-  --sidebar-border: #1F2937;
-  --sidebar-ring: #C5A55A;
+  --border: #4d4635;
+  --input: #3a3939;
+  --ring: #f2ca50;
+  --radius: 0.625rem;
+  --sidebar: #131313;
+  --sidebar-foreground: #e5e2e1;
+  --sidebar-primary: #f2ca50;
+  --sidebar-primary-foreground: #000000;
+  --sidebar-accent: #201f1f;
+  --sidebar-accent-foreground: #e5e2e1;
+  --sidebar-border: #3a3939;
+  --sidebar-ring: #f2ca50;
 }
 
-/* Base DOM Resets & Default Enhancements */
+/* ==============================================================================
+   ✨ STITCH PREMIÈRE GLASSMORPHISM & UTILITY CLASSES
+   ============================================================================== */
+.premium-glass {
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
+}
+
+.btn-primary {
+  background: #2563eb;
+  color: #ffffff;
+  border: 1px solid rgba(37, 99, 235, 0.5);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn-primary:hover {
+  background: #1d4ed8;
+  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-secondary-glass {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #e5e2e1;
+  backdrop-filter: blur(12px);
+  transition: all 0.3s ease;
+}
+.btn-secondary-glass:hover {
+  background: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.btn-gold {
+  background: #f2ca50;
+  color: #000000;
+  border: 1px solid #f2ca50;
+  transition: all 0.3s ease;
+}
+.btn-gold:hover {
+  background: #d4af37;
+  border-color: #d4af37;
+}
+
+.section-padding { 
+  padding-top: 7.5rem; 
+  padding-bottom: 7.5rem; 
+}
+
+.container-custom { 
+  max-width: 1440px; 
+  margin: 0 auto; 
+  padding: 0 5rem; 
+}
+
+@media (max-width: 768px) {
+  .container-custom { 
+    padding: 0 1.5rem; 
+  }
+  .section-padding { 
+    padding-top: 5rem; 
+    padding-bottom: 5rem; 
+  }
+}
+
+.custom-checkbox:checked {
+  background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='black' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
+  border-color: transparent;
+}
+
 @layer base {
   * {
     border-color: var(--border);
@@ -159,18 +203,13 @@
   }
 
   body {
-    background-color: var(--background);
-    color: var(--foreground);
+    background-color: #000000;
+    color: #e5e2e1;
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
   }
 
-  h1, h2, h3, h4, h5, h6 {
+  h1, h2, h3, h4, .font-serif {
     font-family: var(--font-heading);
-  }
-
-  html {
-    font-family: var(--font-sans);
   }
 }

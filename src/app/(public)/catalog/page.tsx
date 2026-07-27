@@ -5,8 +5,8 @@ import { Loader2 } from 'lucide-react';
 import { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Award Catalog & Showroom | Aryan Trophy World',
-  description: 'Explore custom luxury trophies, championship medals, optical crystal monuments, and executive recognition plaques with transparent wholesale pricing tiers.',
+  title: 'The Collection | AURA & Atelier Award Registry',
+  description: 'Discover our curated selection of bespoke luxury awards, championship trophies, medals, and crystal monuments crafted with unparalleled precision.',
 };
 
 export const revalidate = 30; // SSR revalidation
@@ -39,10 +39,10 @@ export default async function CatalogPage({
   return (
     <Suspense
       fallback={
-        <div className="min-h-[70vh] w-full flex flex-col items-center justify-center space-y-3 text-[#1A1F36]">
-          <Loader2 className="w-10 h-10 animate-spin text-[#C5A55A]" />
-          <p className="text-xs font-bold uppercase tracking-widest text-gray-500">
-            Initializing Executive Showroom Repository...
+        <div className="min-h-[80vh] w-full bg-black flex flex-col items-center justify-center space-y-4 text-white">
+          <Loader2 className="w-10 h-10 animate-spin text-[#f2ca50]" />
+          <p className="text-xs font-bold uppercase tracking-[0.3em] text-white/50">
+            Initializing Atelier Collection Registry...
           </p>
         </div>
       }

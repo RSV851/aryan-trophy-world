@@ -1,11 +1,10 @@
 'use client';
 
 import React, { useState } from 'react';
+import Link from 'next/link';
+import Image from 'next/image';
 import { useRouter, useSearchParams, usePathname } from 'next/navigation';
-import { ProductCard } from '@/components/public/product-card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Filter, Search, X, SlidersHorizontal, ArrowLeft, ArrowRight, RotateCcw } from 'lucide-react';
+import { SlidersHorizontal, RotateCcw, ArrowLeft, ArrowRight, X } from 'lucide-react';
 
 interface CatalogClientProps {
   products: Array<any>;
@@ -30,10 +29,11 @@ export function CatalogClient({ products, pagination, filters }: CatalogClientPr
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [filterSearch, setFilterSearch] = useState('');
   const [localSearch, setLocalSearch] = useState(searchParams?.get('search') || '');
 
-  // Current filter parameter getters
+  // Current active parameter getters
   const activeCategory = searchParams?.get('categorySlug') || 'all';
   const activeType = searchParams?.get('typeSlug') || 'all';
   const activeMaterial = searchParams?.get('materialSlug') || 'all';
@@ -49,24 +49,27 @@ export function CatalogClient({ products, pagination, filters }: CatalogClientPr
     } else {
       params.set(key, value);
     }
-    // Always reset to page 1 on filter modification
     if (key !== 'page') {
       params.delete('page');
     }
     router.push(`${pathname}?${params.toString()}`);
   };
 
-  const handleSearchSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    updateParam('search', localSearch.trim());
+  const toggleFilter = (paramKey: string, currentVal: string, newVal: string) => {
+    if (currentVal === newVal) {
+      updateParam(paramKey, null);
+    } else {
+      updateParam(paramKey, newVal);
+    }
   };
 
-  const handleResetFilters = () => {
+  const handleReset = () => {
+    setFilterSearch('');
     setLocalSearch('');
     router.push(pathname);
   };
 
-  const activeFilterCount = [
+  const activeCount = [
     activeCategory !== 'all' ? 1 : 0,
     activeType !== 'all' ? 1 : 0,
     activeMaterial !== 'all' ? 1 : 0,
@@ -75,260 +78,307 @@ export function CatalogClient({ products, pagination, filters }: CatalogClientPr
     searchParams?.get('search') ? 1 : 0,
   ].reduce((a, b) => a + b, 0);
 
+  const filterItem = (item: { name: string; slug: string }) => {
+    if (!filterSearch.trim()) return true;
+    return item.name.toLowerCase().includes(filterSearch.trim().toLowerCase());
+  };
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full flex flex-col space-y-8">
+    <div className="bg-black text-[#e5e2e1] min-h-screen py-16 px-6 sm:px-12 max-w-[1440px] mx-auto">
       
-      {/* Showroom Title Header Bar */}
-      <div className="bg-[#1A1F36] text-white rounded-2xl p-6 sm:p-10 border border-[#C5A55A]/30 shadow-xl relative overflow-hidden flex flex-col md:flex-row md:items-end justify-between gap-6">
-        <div className="space-y-2 relative z-10">
-          <span className="text-xs font-black uppercase tracking-widest text-[#090909] bg-[#C5A55A] px-3 py-1 rounded-md inline-block font-serif">
-            Executive Repository
-          </span>
-          <h1 className="text-3xl sm:text-5xl font-black uppercase tracking-tight font-serif">
-            Award Catalog Showroom
-          </h1>
-          <p className="text-xs sm:text-sm text-gray-300 max-w-xl">
-            Inspect custom trophies, Olympic medals, and acrylic monuments. Use multi-tier structural filters to refine awards and add items to your quote basket.
-          </p>
-        </div>
-        <div className="flex items-center space-x-3 relative z-10">
-          <Button
-            onClick={() => setMobileFilterOpen(!mobileFilterOpen)}
-            variant="outline"
-            className="lg:hidden bg-white/10 hover:bg-white/20 text-white border-white/30 font-bold uppercase text-xs h-11 px-4 rounded-xl flex items-center space-x-2"
-          >
-            <SlidersHorizontal className="w-4 h-4 text-[#C5A55A]" />
-            <span>Filters ({activeFilterCount})</span>
-          </Button>
-          {activeFilterCount > 0 && (
-            <Button
-              onClick={handleResetFilters}
-              variant="ghost"
-              className="text-xs font-bold uppercase tracking-wider text-[#C5A55A] hover:bg-white/10 px-3 h-11 rounded-xl flex items-center space-x-1.5"
+      {/* Header & Breadcrumbs */}
+      <div className="mb-12">
+        <nav className="text-[#d0c5af] font-sans text-xs uppercase tracking-[0.2em] font-semibold mb-4 flex items-center space-x-2">
+          <Link href="/" className="hover:text-[#f2ca50] transition-colors">HOME</Link>
+          <span>/</span>
+          <span className="text-[#f2ca50]">CATALOG</span>
+        </nav>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="text-4xl md:text-6xl font-display font-light text-white">The Collection</h1>
+            <p className="text-white/60 mt-4 max-w-2xl text-base md:text-lg leading-relaxed">
+              Discover our curated selection of bespoke awards, crafted with unparalleled precision from the finest materials.
+            </p>
+          </div>
+          <div className="flex items-center gap-4">
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="lg:hidden bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-lg text-xs uppercase tracking-widest font-semibold flex items-center gap-2 border border-white/20"
             >
-              <RotateCcw className="w-3.5 h-3.5" />
-              <span>Reset All</span>
-            </Button>
-          )}
+              <SlidersHorizontal className="w-4 h-4 text-[#f2ca50]" />
+              <span>Filters ({activeCount})</span>
+            </button>
+            <select
+              value={`${activeSort}-${activeOrder}`}
+              onChange={(e) => {
+                const [sort, order] = e.target.value.split('-');
+                const params = new URLSearchParams(searchParams?.toString() || '');
+                params.set('sortBy', sort);
+                params.set('sortOrder', order);
+                router.push(`${pathname}?${params.toString()}`);
+              }}
+              className="bg-white/5 border border-white/20 text-xs font-semibold text-white px-4 py-2 rounded-lg uppercase tracking-widest outline-none focus:border-[#f2ca50]"
+            >
+              <option value="createdAt-desc" className="bg-[#131313]">Newest First</option>
+              <option value="name-asc" className="bg-[#131313]">Name A-Z</option>
+              <option value="name-desc" className="bg-[#131313]">Name Z-A</option>
+            </select>
+          </div>
         </div>
       </div>
 
-      {/* Main Content Workspace: Sidebar + Products Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-10 items-start">
         
-        {/* Left Sidebar Filter Repository */}
-        <aside
-          className={`lg:block lg:col-span-1 space-y-6 bg-gray-50/80 p-6 rounded-2xl border border-gray-200 shadow-sm self-start sticky top-24 ${
-            mobileFilterOpen ? 'block' : 'hidden'
-          }`}
-        >
-          <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-            <h2 className="text-sm font-black uppercase tracking-wider text-[#1A1F36] font-serif flex items-center space-x-2">
-              <Filter className="w-4 h-4 text-[#C5A55A]" />
-              <span>Catalog Filters</span>
-            </h2>
-            {mobileFilterOpen && (
-              <button onClick={() => setMobileFilterOpen(false)} className="text-gray-500 hover:text-black lg:hidden">
-                <X className="w-5 h-5" />
+        {/* Sidebar Filters */}
+        <aside className={`lg:col-span-1 lg:sticky top-28 flex flex-col gap-8 backdrop-blur-xl bg-white/[0.03] border border-white/10 rounded-xl p-6 ${
+          mobileOpen ? 'block fixed inset-4 z-50 overflow-y-auto bg-[#131313] border-2 border-[#f2ca50]' : 'hidden lg:flex'
+        }`}>
+          {mobileOpen && (
+            <div className="flex items-center justify-between lg:hidden pb-4 border-b border-white/10">
+              <span className="font-display font-light text-xl text-white">Filter Showroom</span>
+              <button onClick={() => setMobileOpen(false)} className="text-white/60 hover:text-white">
+                <X className="w-6 h-6" />
               </button>
-            )}
-          </div>
-
-          {/* Search Box Filter */}
-          <form onSubmit={handleSearchSubmit} className="space-y-1.5">
-            <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-700">Keyword Search</label>
-            <div className="relative">
-              <Input
-                type="text"
-                placeholder="Name, SKU, keyword..."
-                value={localSearch}
-                onChange={(e) => setLocalSearch(e.target.value)}
-                className="bg-white border-gray-300 pl-8 pr-3 h-10 rounded-xl text-xs"
-              />
-              <Search className="w-3.5 h-3.5 text-gray-400 absolute left-2.5 top-3" />
             </div>
-          </form>
+          )}
 
-          {/* Category Filter */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-700">Award Category</label>
-            <select
-              value={activeCategory}
-              onChange={(e) => updateParam('categorySlug', e.target.value)}
-              className="w-full bg-white border border-gray-300 rounded-xl h-10 px-3 text-xs font-medium text-gray-800 focus:border-[#C5A55A] focus:ring-1 focus:ring-[#C5A55A]"
-            >
-              <option value="all">All Categories ({filters.categories.length})</option>
-              {filters.categories.map((c) => (
-                <option key={c.id} value={c.slug}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+          {/* Search filters input */}
+          <div className="mb-2">
+            <div className="relative flex items-center">
+              <input
+                type="text"
+                value={filterSearch}
+                onChange={(e) => setFilterSearch(e.target.value)}
+                placeholder="Search filters..."
+                className="bg-white/5 border border-white/10 rounded-sm py-2 pl-3 pr-8 text-sm text-white placeholder:text-white/40 focus:outline-none focus:border-[#f2ca50] transition-all w-full"
+              />
+              <span className="material-symbols-outlined absolute right-2 text-[#f2ca50] text-lg pointer-events-none">search</span>
+            </div>
           </div>
 
-          {/* Product Type Filter */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-700">Product Type</label>
-            <select
-              value={activeType}
-              onChange={(e) => updateParam('typeSlug', e.target.value)}
-              className="w-full bg-white border border-gray-300 rounded-xl h-10 px-3 text-xs font-medium text-gray-800 focus:border-[#C5A55A] focus:ring-1 focus:ring-[#C5A55A]"
+          {activeCount > 0 && (
+            <button
+              onClick={handleReset}
+              className="w-full bg-[#2563eb]/20 hover:bg-[#2563eb]/40 text-[#2563eb] hover:text-white border border-[#2563eb]/50 py-2 rounded-md text-xs font-bold uppercase tracking-widest transition-all flex items-center justify-center gap-2"
             >
-              <option value="all">All Types (Trophy, Medal, Pin...)</option>
-              {filters.productTypes.map((t) => (
-                <option key={t.id} value={t.slug}>
-                  {t.name}
-                </option>
-              ))}
-            </select>
-          </div>
+              <RotateCcw className="w-3.5 h-3.5" />
+              <span>Reset All Filters</span>
+            </button>
+          )}
 
-          {/* Material Filter */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-700">Material Structure</label>
-            <select
-              value={activeMaterial}
-              onChange={(e) => updateParam('materialSlug', e.target.value)}
-              className="w-full bg-white border border-gray-300 rounded-xl h-10 px-3 text-xs font-medium text-gray-800 focus:border-[#C5A55A] focus:ring-1 focus:ring-[#C5A55A]"
-            >
-              <option value="all">All Materials (Metal, Crystal...)</option>
-              {filters.materials.map((m) => (
-                <option key={m.id} value={m.slug}>
-                  {m.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Category Accordion */}
+          <details className="group border-b border-white/10 pb-4" open>
+            <summary className="flex justify-between items-center cursor-pointer list-none">
+              <h3 className="text-lg font-display text-[#f2ca50]">Category</h3>
+              <span className="material-symbols-outlined text-[#f2ca50] transition-transform group-open:rotate-180">expand_more</span>
+            </summary>
+            <ul className="mt-4 space-y-3 font-sans text-sm">
+              {(filters.categories || []).filter(filterItem).map((cat: any) => {
+                const isChecked = activeCategory === cat.slug;
+                return (
+                  <li key={cat.id}>
+                    <label className="flex items-center space-x-3 cursor-pointer group/item">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => toggleFilter('categorySlug', activeCategory, cat.slug)}
+                        className="custom-checkbox appearance-none w-4 h-4 border border-white/40 rounded-sm bg-transparent checked:bg-[#d4af37] transition-all cursor-pointer group-hover/item:border-[#f2ca50]"
+                      />
+                      <span className="text-white/80 group-hover/item:text-[#f2ca50] transition-colors">{cat.name}</span>
+                    </label>
+                  </li>
+                );
+              })}
+              {(!filters.categories || filters.categories.length === 0) && (
+                <li className="text-white/40 text-xs">No categories populated yet.</li>
+              )}
+            </ul>
+          </details>
 
-          {/* Theme Filter */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-700">Event Theme</label>
-            <select
-              value={activeTheme}
-              onChange={(e) => updateParam('themeSlug', e.target.value)}
-              className="w-full bg-white border border-gray-300 rounded-xl h-10 px-3 text-xs font-medium text-gray-800 focus:border-[#C5A55A] focus:ring-1 focus:ring-[#C5A55A]"
-            >
-              <option value="all">All Themes (Sports, Academic...)</option>
-              {filters.themes.map((th) => (
-                <option key={th.id} value={th.slug}>
-                  {th.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Type Accordion */}
+          <details className="group border-b border-white/10 pb-4" open>
+            <summary className="flex justify-between items-center cursor-pointer list-none">
+              <h3 className="text-lg font-display text-[#f2ca50]">Award Type</h3>
+              <span className="material-symbols-outlined text-[#f2ca50] transition-transform group-open:rotate-180">expand_more</span>
+            </summary>
+            <ul className="mt-4 space-y-3 font-sans text-sm">
+              {(filters.productTypes || []).filter(filterItem).map((type: any) => {
+                const isChecked = activeType === type.slug;
+                return (
+                  <li key={type.id}>
+                    <label className="flex items-center space-x-3 cursor-pointer group/item">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => toggleFilter('typeSlug', activeType, type.slug)}
+                        className="custom-checkbox appearance-none w-4 h-4 border border-white/40 rounded-sm bg-transparent checked:bg-[#d4af37] transition-all cursor-pointer group-hover/item:border-[#f2ca50]"
+                      />
+                      <span className="text-white/80 group-hover/item:text-[#f2ca50] transition-colors">{type.name}</span>
+                    </label>
+                  </li>
+                );
+              })}
+              {(!filters.productTypes || filters.productTypes.length === 0) && (
+                <li className="text-white/40 text-xs">No product types found.</li>
+              )}
+            </ul>
+          </details>
 
-          {/* Collection Filter */}
-          <div className="space-y-2">
-            <label className="text-[11px] font-extrabold uppercase tracking-wider text-gray-700">Curated Collection</label>
-            <select
-              value={activeCollection}
-              onChange={(e) => updateParam('collectionSlug', e.target.value)}
-              className="w-full bg-white border border-gray-300 rounded-xl h-10 px-3 text-xs font-medium text-gray-800 focus:border-[#C5A55A] focus:ring-1 focus:ring-[#C5A55A]"
-            >
-              <option value="all">All Collections</option>
-              {filters.collections.map((col) => (
-                <option key={col.id} value={col.slug}>
-                  {col.name}
-                </option>
-              ))}
-            </select>
-          </div>
+          {/* Material Accordion */}
+          <details className="group border-b border-white/10 pb-4" open>
+            <summary className="flex justify-between items-center cursor-pointer list-none">
+              <h3 className="text-lg font-display text-[#f2ca50]">Material</h3>
+              <span className="material-symbols-outlined text-[#f2ca50] transition-transform group-open:rotate-180">expand_more</span>
+            </summary>
+            <ul className="mt-4 space-y-3 font-sans text-sm">
+              {(filters.materials || []).filter(filterItem).map((mat: any) => {
+                const isChecked = activeMaterial === mat.slug;
+                return (
+                  <li key={mat.id}>
+                    <label className="flex items-center space-x-3 cursor-pointer group/item">
+                      <input
+                        type="checkbox"
+                        checked={isChecked}
+                        onChange={() => toggleFilter('materialSlug', activeMaterial, mat.slug)}
+                        className="custom-checkbox appearance-none w-4 h-4 border border-white/40 rounded-sm bg-transparent checked:bg-[#d4af37] transition-all cursor-pointer group-hover/item:border-[#f2ca50]"
+                      />
+                      <span className="text-white/80 group-hover/item:text-[#f2ca50] transition-colors">{mat.name}</span>
+                    </label>
+                  </li>
+                );
+              })}
+              {(!filters.materials || filters.materials.length === 0) && (
+                <li className="text-white/40 text-xs">No materials found.</li>
+              )}
+            </ul>
+          </details>
 
-          {activeFilterCount > 0 && (
-            <Button
-              onClick={handleResetFilters}
-              variant="outline"
-              className="w-full border-rose-200 text-rose-600 hover:bg-rose-50 text-xs font-bold uppercase h-10 rounded-xl shadow-sm"
+          {/* Collection Accordion */}
+          {filters.collections && filters.collections.length > 0 && (
+            <details className="group pb-2" open>
+              <summary className="flex justify-between items-center cursor-pointer list-none">
+                <h3 className="text-lg font-display text-[#f2ca50]">Collection</h3>
+                <span className="material-symbols-outlined text-[#f2ca50] transition-transform group-open:rotate-180">expand_more</span>
+              </summary>
+              <ul className="mt-4 space-y-3 font-sans text-sm">
+                {filters.collections.filter(filterItem).map((col: any) => {
+                  const isChecked = activeCollection === col.slug;
+                  return (
+                    <li key={col.id}>
+                      <label className="flex items-center space-x-3 cursor-pointer group/item">
+                        <input
+                          type="checkbox"
+                          checked={isChecked}
+                          onChange={() => toggleFilter('collectionSlug', activeCollection, col.slug)}
+                          className="custom-checkbox appearance-none w-4 h-4 border border-white/40 rounded-sm bg-transparent checked:bg-[#d4af37] transition-all cursor-pointer group-hover/item:border-[#f2ca50]"
+                        />
+                        <span className="text-white/80 group-hover/item:text-[#f2ca50] transition-colors">{col.name}</span>
+                      </label>
+                    </li>
+                  );
+                })}
+              </ul>
+            </details>
+          )}
+
+          {mobileOpen && (
+            <button
+              onClick={() => setMobileOpen(false)}
+              className="btn-gold w-full py-3 rounded-lg text-xs font-black uppercase tracking-widest lg:hidden mt-4"
             >
-              Reset All Filters
-            </Button>
+              Apply Selection & Close
+            </button>
           )}
         </aside>
 
-        {/* Right Product Showcase Workspace */}
-        <main className="lg:col-span-3 space-y-6">
-          
-          {/* Controls Bar: Results Counter + Sorting Dropdown */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-200 gap-3">
-            <span className="text-xs font-bold uppercase tracking-wider text-gray-600">
-              Showing <span className="text-[#1A1F36] font-black">{products.length}</span> of <span className="text-[#1A1F36] font-black">{pagination.total}</span> awards
-              {activeFilterCount > 0 && ` (Filtered)`}
-            </span>
+        {/* Product Grid */}
+        <main className="lg:col-span-3">
+          {products && products.length > 0 ? (
+            <div className="space-y-12">
+              <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-8">
+                {products.map((prod: any) => {
+                  const img = prod.images?.[0]?.imageUrl || 'https://images.unsplash.com/photo-1541534741688-6078c6bfb5c5?w=600&auto=format&fit=crop&q=80';
+                  const catName = prod.category?.name || 'Prestige Collection';
+                  const typeName = prod.productType?.name || 'Award';
+                  const price = prod.pricingMatrix?.[0]?.pricePerPiece ? `₹${prod.pricingMatrix?.[0]?.pricePerPiece}` : '$249';
 
-            <div className="flex items-center space-x-2">
-              <span className="text-xs font-bold text-gray-500 uppercase">Sort By:</span>
-              <select
-                value={`${activeSort}_${activeOrder}`}
-                onChange={(e) => {
-                  const [sb, so] = e.target.value.split('_');
-                  updateParam('sortBy', sb);
-                  updateParam('sortOrder', so);
-                }}
-                className="bg-white border border-gray-300 rounded-lg text-xs font-semibold text-gray-800 px-3 py-1.5 h-9 focus:border-[#C5A55A]"
-              >
-                <option value="createdAt_desc">Newest Showroom Additions</option>
-                <option value="featured_desc">Featured Excellence First</option>
-                <option value="name_asc">Alphabetical (A - Z)</option>
-                <option value="name_desc">Alphabetical (Z - A)</option>
-              </select>
-            </div>
-          </div>
+                  return (
+                    <div key={prod.id} className="premium-glass rounded-2xl overflow-hidden group flex flex-col transition-all duration-500 hover:-translate-y-1">
+                      <Link href={`/products/${prod.slug || prod.id}`} className="relative overflow-hidden aspect-[4/5] block">
+                        <span className="absolute top-4 left-4 z-10 bg-[#2563eb]/90 backdrop-blur-md text-white text-[9px] px-3 py-1 rounded-full uppercase font-bold tracking-widest">
+                          {typeName}
+                        </span>
+                        <Image
+                          alt={prod.name}
+                          src={img}
+                          fill
+                          className="object-cover transition-transform duration-700 group-hover:scale-105"
+                        />
+                      </Link>
+                      <div className="p-8 flex-1 flex flex-col justify-between">
+                        <div>
+                          <Link href={`/products/${prod.slug || prod.id}`}>
+                            <h3 className="text-xl font-display text-white mb-2 hover:text-[#f2ca50] transition-colors">{prod.name}</h3>
+                          </Link>
+                          <p className="text-white/40 text-[11px] uppercase tracking-wider mb-6">{catName}</p>
+                        </div>
+                        <div className="flex items-center justify-between pt-6 border-t border-white/5">
+                          <span className="text-white font-semibold text-lg">{price}</span>
+                          <Link href={`/products/${prod.slug || prod.id}`} className="text-[#f2ca50] text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors">
+                            Inquiry
+                          </Link>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
 
-          {/* Product Cards Grid */}
-          {products.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-6">
-              {products.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
+              {/* Pagination */}
+              {pagination && pagination.totalPages > 1 && (
+                <div className="flex items-center justify-between pt-12 border-t border-white/10">
+                  <button
+                    disabled={pagination.page <= 1}
+                    onClick={() => updateParam('page', (pagination.page - 1).toString())}
+                    className="premium-glass px-6 py-3 rounded-lg text-xs font-semibold text-white/80 disabled:opacity-30 disabled:pointer-events-none hover:text-[#f2ca50] transition-all flex items-center gap-2 uppercase tracking-wider"
+                  >
+                    <ArrowLeft className="w-4 h-4" />
+                    <span>Previous</span>
+                  </button>
+                  
+                  <span className="text-xs uppercase tracking-widest font-mono text-[#f2ca50] bg-white/5 px-4 py-2 rounded-lg">
+                    Page {pagination.page} of {pagination.totalPages}
+                  </span>
+
+                  <button
+                    disabled={pagination.page >= pagination.totalPages}
+                    onClick={() => updateParam('page', (pagination.page + 1).toString())}
+                    className="premium-glass px-6 py-3 rounded-lg text-xs font-semibold text-white/80 disabled:opacity-30 disabled:pointer-events-none hover:text-[#f2ca50] transition-all flex items-center gap-2 uppercase tracking-wider"
+                  >
+                    <span>Next</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              )}
             </div>
           ) : (
-            <div className="py-24 text-center bg-gray-50/60 rounded-2xl border border-dashed border-gray-300 space-y-3">
-              <div className="w-12 h-12 bg-[#1A1F36] text-[#C5A55A] rounded-xl flex items-center justify-center mx-auto shadow-md font-bold">
-                <Search className="w-6 h-6" />
-              </div>
-              <h3 className="text-lg font-bold font-serif text-[#1A1F36] uppercase">No Trophies Matched Criteria</h3>
-              <p className="text-xs text-gray-500 max-w-md mx-auto">
-                We could not locate items matching your active filter combination. Please clear selected parameters to view our full collection.
+            /* Empty State */
+            <div className="premium-glass rounded-2xl p-16 text-center space-y-6 max-w-xl mx-auto my-12 border border-white/10">
+              <span className="material-symbols-outlined text-6xl text-[#f2ca50]">emoji_events</span>
+              <h3 className="text-2xl font-display font-light text-white">No matches in our atelier registry</h3>
+              <p className="text-white/50 text-sm leading-relaxed">
+                We couldn't find any trophies matching your specific filter refinement. Please adjust your criteria or reset filters to inspect our full showroom.
               </p>
-              <Button
-                onClick={handleResetFilters}
-                className="mt-2 bg-[#1A1F36] hover:bg-[#C5A55A] text-white hover:text-[#090909] font-extrabold uppercase text-xs h-10 px-6 rounded-xl shadow"
+              <button
+                onClick={handleReset}
+                className="btn-primary px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest"
               >
-                Show All Products
-              </Button>
+                Reset Filter Selection
+              </button>
             </div>
           )}
-
-          {/* Pagination Controls */}
-          {pagination.totalPages > 1 && (
-            <div className="pt-8 border-t border-gray-200 flex items-center justify-between text-xs">
-              <Button
-                disabled={pagination.page <= 1}
-                onClick={() => updateParam('page', String(pagination.page - 1))}
-                variant="outline"
-                className="h-10 px-4 font-bold uppercase rounded-xl border-gray-300"
-              >
-                <ArrowLeft className="w-3.5 h-3.5 mr-1.5" />
-                <span>Previous</span>
-              </Button>
-
-              <span className="font-bold text-gray-700">
-                Page <span className="text-[#C5A55A] font-black">{pagination.page}</span> of {pagination.totalPages}
-              </span>
-
-              <Button
-                disabled={pagination.page >= pagination.totalPages}
-                onClick={() => updateParam('page', String(pagination.page + 1))}
-                variant="outline"
-                className="h-10 px-4 font-bold uppercase rounded-xl border-gray-300"
-              >
-                <span>Next</span>
-                <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
-              </Button>
-            </div>
-          )}
-
         </main>
+
       </div>
     </div>
   );

@@ -1,145 +1,95 @@
+'use client';
+
 import React from 'react';
 import Link from 'next/link';
-import { Trophy, MapPin, Phone, Mail, Clock, ArrowRight, ShieldCheck } from 'lucide-react';
-import { Button } from '@/components/ui/button';
 
 interface FooterProps {
-  settings: Record<string, any>;
-  profile: any;
-  categories: Array<{ id: string; name: string; slug: string }>;
+  settings?: Record<string, any>;
+  profile?: any;
+  categories?: any[];
 }
 
-export function Footer({ settings, profile, categories }: FooterProps) {
-  const brandName = settings?.site_name || process.env.NEXT_PUBLIC_SITE_NAME || 'Aryan Trophy World';
-  const phone = profile?.phone || settings?.contact_phone || '+91-9876543210';
-  const email = profile?.email || settings?.contact_email || 'info@aryantrophyworld.com';
-  const address = profile?.address ? `${profile.address}, ${profile.city || ''}, ${profile.state || ''} ${profile.pincode || ''}` : 'Shop 12, Trophy Market, MG Road, Mumbai, Maharashtra 400001';
-  const bio = profile?.bio || settings?.site_description || 'Premier designer and creator of custom championship trophies, executive plaques, crystal monuments, and precision badges.';
-
+export function Footer({ settings, profile }: FooterProps) {
+  const brandName = settings?.site_name || 'ATELIER PREMIÈRE';
+  const phone = profile?.phone || settings?.contact_phone || '+91 98765 43210';
+  const email = profile?.email || settings?.contact_email || 'atelier@aryantrophyworld.com';
+  const address = profile?.address ? `${profile.address}, ${profile.city || ''} ${profile.pincode || ''}` : 'Atelier Suite 12, Vishva Complex, Viman Nagar, Pune 411014';
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer className="bg-[#1A1F36] text-white border-t border-[#C5A55A]/30 relative overflow-hidden">
-      {/* Subtle luxury background gradient glow */}
-      <div className="absolute top-0 right-0 w-[400px] h-[400px] bg-[#C5A55A]/5 rounded-full blur-[140px] pointer-events-none" />
-
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-16 pb-12 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
+    <footer className="bg-black pt-32 pb-16 border-t border-white/5 text-[#e5e2e1]" data-purpose="site-footer">
+      <div className="container-custom">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-16 mb-24">
           
-          {/* Col 1: Brand Heritage */}
-          <div className="space-y-4">
-            <Link href="/" className="flex items-center space-x-3">
-              <div className="w-10 h-10 rounded-xl bg-[#C5A55A] flex items-center justify-center text-[#090909] font-black shadow-[0_0_15px_rgba(197,165,90,0.3)]">
-                <Trophy className="w-5 h-5 stroke-[2.5]" />
-              </div>
-              <span className="text-xl font-bold uppercase font-serif tracking-tight text-white">
-                {brandName}
-              </span>
-            </Link>
-            <p className="text-xs text-gray-300 leading-relaxed font-sans pr-4">
-              {bio}
+          {/* Brand Info */}
+          <div className="col-span-1 md:col-span-1">
+            <div className="text-xl font-display font-light tracking-[0.2em] text-[#f2ca50] mb-8 uppercase">
+              {brandName}
+            </div>
+            <p className="text-white/40 text-sm leading-relaxed mb-8 max-w-xs">
+              The pinnacle of luxury awards, medals, and corporate mementos. Crafting excellence for the world's most prestigious achievements since 2008.
             </p>
-            <div className="pt-2 flex items-center space-x-2 text-xs font-semibold text-[#C5A55A] uppercase tracking-wider">
-              <ShieldCheck className="w-4 h-4" />
-              <span>Verified Prestige Manufacturer</span>
+            <div className="flex space-x-6">
+              <a href="#" className="text-white/30 hover:text-[#2563eb] transition-colors" title="Official Website">
+                <span className="material-symbols-outlined">public</span>
+              </a>
+              <a href="#" className="text-white/30 hover:text-[#2563eb] transition-colors" title="Share Portfolio">
+                <span className="material-symbols-outlined">share</span>
+              </a>
+              <a href={`mailto:${email}`} className="text-white/30 hover:text-[#2563eb] transition-colors" title="Direct Mail">
+                <span className="material-symbols-outlined">mail</span>
+              </a>
             </div>
           </div>
 
-          {/* Col 2: Showroom Collections */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#C5A55A] font-serif">
-              Award Classifications
-            </h3>
-            <ul className="space-y-2 text-xs font-medium text-gray-300">
-              {categories.slice(0, 6).map((cat) => (
-                <li key={cat.id}>
-                  <Link
-                    href={`/catalog?categorySlug=${cat.slug}`}
-                    className="hover:text-[#C5A55A] transition-colors flex items-center space-x-1.5"
-                  >
-                    <ArrowRight className="w-3 h-3 text-[#C5A55A]" />
-                    <span>{cat.name} Awards</span>
-                  </Link>
-                </li>
-              ))}
-              <li>
-                <Link href="/catalog" className="text-[#C5A55A] font-bold hover:underline inline-flex items-center space-x-1 pt-1">
-                  <span>Browse Full Showroom</span>
-                  <ArrowRight className="w-3 h-3" />
-                </Link>
-              </li>
+          {/* Navigation */}
+          <div>
+            <h5 className="text-white font-bold uppercase tracking-[0.2em] text-[10px] mb-10">Navigation</h5>
+            <ul className="space-y-5 text-xs text-white/40 uppercase tracking-widest font-semibold">
+              <li><Link href="/admin/login" className="hover:text-[#f2ca50] transition-colors">Executive Dashboard</Link></li>
+              <li><Link href="/catalog" className="hover:text-[#f2ca50] transition-colors">Product Registry</Link></li>
+              <li><Link href="/catalog" className="hover:text-[#f2ca50] transition-colors">Categories</Link></li>
+              <li><Link href="/about" className="hover:text-[#f2ca50] transition-colors">Brand Story</Link></li>
+              <li><Link href="/contact" className="hover:text-[#f2ca50] transition-colors">Contact</Link></li>
             </ul>
           </div>
 
-          {/* Col 3: Customer Guidance */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#C5A55A] font-serif">
-              Client Guidance
-            </h3>
-            <ul className="space-y-2.5 text-xs font-medium text-gray-300">
-              <li>
-                <Link href="/about" className="hover:text-white transition-colors">Our Craftsmanship Heritage</Link>
-              </li>
-              <li>
-                <Link href="/inquiry" className="hover:text-white transition-colors">Wholesale Inquiry Process</Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-white transition-colors">Custom Logo & Engraving Support</Link>
-              </li>
-              <li>
-                <Link href="/contact" className="hover:text-white transition-colors">Bulk Corporate Quotation Requests</Link>
-              </li>
-              <li className="pt-2 text-[11px] text-[#C5A55A]/90 font-mono italic">
-                * Zero e-commerce signup required. Simply select awards & submit custom inquiry.
-              </li>
+          {/* Collections */}
+          <div>
+            <h5 className="text-white font-bold uppercase tracking-[0.2em] text-[10px] mb-10">Collections</h5>
+            <ul className="space-y-5 text-xs text-white/40 uppercase tracking-widest font-semibold">
+              <li><Link href="/catalog?category=Sports" className="hover:text-[#f2ca50] transition-colors">Sports Series</Link></li>
+              <li><Link href="/catalog?material=Crystal" className="hover:text-[#f2ca50] transition-colors">Corporate Glass</Link></li>
+              <li><Link href="/catalog?material=Metal" className="hover:text-[#f2ca50] transition-colors">Academic Gold</Link></li>
+              <li><Link href="/catalog?material=Wooden" className="hover:text-[#f2ca50] transition-colors">Bespoke Casing</Link></li>
+              <li><Link href="/catalog?collection=Premium" className="hover:text-[#f2ca50] transition-colors">Limited Range</Link></li>
             </ul>
           </div>
 
-          {/* Col 4: Workshop Coordinates */}
-          <div className="space-y-4">
-            <h3 className="text-xs font-black uppercase tracking-widest text-[#C5A55A] font-serif">
-              Workshop & Studio
-            </h3>
-            <div className="space-y-3 text-xs text-gray-300">
-              <div className="flex items-start space-x-3">
-                <MapPin className="w-4 h-4 text-[#C5A55A] flex-shrink-0 mt-0.5" />
-                <span className="leading-tight">{address}</span>
+          {/* Headquarters */}
+          <div>
+            <h5 className="text-white font-bold uppercase tracking-[0.2em] text-[10px] mb-10">Headquarters</h5>
+            <div className="text-xs text-white/40 space-y-6 font-semibold tracking-wider">
+              <p className="leading-loose">{address}</p>
+              <p className="text-white font-mono text-sm">{phone}</p>
+              <div className="pt-6 border-t border-white/10 space-y-3">
+                <p className="text-[9px] uppercase tracking-[0.3em] text-white/30">Operating Hours</p>
+                <p className="text-white/70">Mon - Sat: 10 AM - 8:30 PM</p>
+                <p className="text-white/70">Sun: By Appointment Only</p>
               </div>
-              <div className="flex items-center space-x-3">
-                <Phone className="w-4 h-4 text-[#C5A55A] flex-shrink-0" />
-                <span className="font-mono font-semibold text-white">{phone}</span>
-              </div>
-              <div className="flex items-center space-x-3">
-                <Mail className="w-4 h-4 text-[#C5A55A] flex-shrink-0" />
-                <span className="font-mono text-white">{email}</span>
-              </div>
-              <div className="flex items-center space-x-3 text-[11px] text-gray-400">
-                <Clock className="w-3.5 h-3.5 text-[#C5A55A]" />
-                <span>Mon – Sat: 10:00 AM – 8:00 PM IST</span>
-              </div>
-            </div>
-            <div className="pt-2">
-              <Link href="/inquiry">
-                <Button className="w-full bg-[#C5A55A] hover:bg-[#d5b568] text-[#090909] font-black uppercase text-[11px] h-9 rounded-lg shadow-md">
-                  Request Immediate Quote
-                </Button>
-              </Link>
             </div>
           </div>
 
         </div>
 
-        {/* Bottom Bar / Copyright */}
-        <div className="mt-12 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between text-xs text-gray-400">
-          <p>© {currentYear} {brandName}. All rights reserved. Precision crafted for excellence.</p>
-          <div className="mt-4 sm:mt-0 flex items-center space-x-6">
-            <Link href="/admin/login" className="hover:text-[#C5A55A] font-mono transition-colors">
-              Executive CMS Access
-            </Link>
-            <span>•</span>
-            <span className="text-[#C5A55A] font-serif font-bold tracking-wider">
-              The Trophy Atelier
-            </span>
+        {/* Copyright Footer */}
+        <div className="pt-16 border-t border-white/5 flex flex-col md:flex-row justify-between items-center gap-8">
+          <p className="text-[9px] text-white/20 uppercase tracking-[0.3em]">
+            © {currentYear} {brandName}. SYSTEM V2.4.0
+          </p>
+          <div className="flex gap-8 text-[9px] text-white/20 uppercase tracking-[0.3em]">
+            <Link href="/about" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link href="/about" className="hover:text-white transition-colors">Terms of Service</Link>
           </div>
         </div>
       </div>

@@ -1,18 +1,7 @@
 import type { Metadata } from "next";
-import { Inter, Playfair_Display, Geist_Mono } from "next/font/google";
+import { Inter, Libre_Caslon_Text, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
-
-/* ==============================================================================
-   🔤 GLOBAL TYPOGRAPHY CONFIGURATION (EASY TO CHANGE ANYWHERE BY CODE)
-   ==============================================================================
-   To change fonts across the entire website & Admin CMS manually:
-   1. Import your preferred Google font above (e.g., Montserrat, Poppins, Outfit, Cinzel).
-   2. Swap the variable assignments below:
-      - `--font-body` controls standard sans-serif text (navigation, tables, buttons, inputs).
-      - `--font-heading` controls luxury titles & headers (Trophy Atelier, card titles, stats).
-      - `--font-mono` controls SKUs, product IDs, numbers, and technical specifications.
-   ============================================================================== */
 
 const bodyFont = Inter({
   variable: "--font-body",
@@ -20,8 +9,10 @@ const bodyFont = Inter({
   display: "swap",
 });
 
-const headingFont = Playfair_Display({
+const headingFont = Libre_Caslon_Text({
   variable: "--font-heading",
+  weight: ["400", "700"],
+  style: ["normal", "italic"],
   subsets: ["latin"],
   display: "swap",
 });
@@ -33,8 +24,8 @@ const monoFont = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Aryan Trophy World | Premium Trophies & Awards Catalog",
-  description: "Explore exquisite customized trophies, medals, plaques, and awards crafted with unmatched quality. Request custom quote inquiries directly from our showroom catalog.",
+  title: "Atelier Première | Aryan Trophy World - Premium Trophy Showroom",
+  description: "Explore exquisite customized trophies, medals, plaques, and corporate awards crafted with unmatched luxury. Request custom quote inquiries directly from our atelier catalog.",
 };
 
 export default function RootLayout({
@@ -45,13 +36,20 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${bodyFont.variable} ${headingFont.variable} ${monoFont.variable} h-full antialiased`}
+      className={`${bodyFont.variable} ${headingFont.variable} ${monoFont.variable} dark h-full antialiased`}
       suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
+      <head>
+        <link
+          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
+          rel="stylesheet"
+        />
+      </head>
+      <body className="min-h-full flex flex-col bg-black text-[#e5e2e1] font-sans selection:bg-[#f2ca50]/30 selection:text-[#f2ca50]">
         {children}
-        <Toaster position="top-right" richColors theme="system" />
+        <Toaster position="top-right" richColors theme="dark" />
       </body>
     </html>
   );
 }
+

@@ -1,16 +1,35 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, Playfair_Display, Geist_Mono } from "next/font/google";
 import { Toaster } from "sonner";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+/* ==============================================================================
+   🔤 GLOBAL TYPOGRAPHY CONFIGURATION (EASY TO CHANGE ANYWHERE BY CODE)
+   ==============================================================================
+   To change fonts across the entire website & Admin CMS manually:
+   1. Import your preferred Google font above (e.g., Montserrat, Poppins, Outfit, Cinzel).
+   2. Swap the variable assignments below:
+      - `--font-body` controls standard sans-serif text (navigation, tables, buttons, inputs).
+      - `--font-heading` controls luxury titles & headers (Trophy Atelier, card titles, stats).
+      - `--font-mono` controls SKUs, product IDs, numbers, and technical specifications.
+   ============================================================================== */
+
+const bodyFont = Inter({
+  variable: "--font-body",
   subsets: ["latin"],
+  display: "swap",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const headingFont = Playfair_Display({
+  variable: "--font-heading",
   subsets: ["latin"],
+  display: "swap",
+});
+
+const monoFont = Geist_Mono({
+  variable: "--font-mono",
+  subsets: ["latin"],
+  display: "swap",
 });
 
 export const metadata: Metadata = {
@@ -26,9 +45,10 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`${bodyFont.variable} ${headingFont.variable} ${monoFont.variable} h-full antialiased`}
+      suppressHydrationWarning
     >
-      <body className="min-h-full flex flex-col bg-background text-foreground">
+      <body className="min-h-full flex flex-col bg-background text-foreground font-sans">
         {children}
         <Toaster position="top-right" richColors theme="system" />
       </body>

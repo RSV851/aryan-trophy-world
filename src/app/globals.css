@@ -4,22 +4,40 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* ==============================================================================
+   🌟 TAILWIND V4 GLOBAL THEME ENGINE (FONT & COLOR MAPPING)
+   ==============================================================================
+   This section connects our simple HEX codes and Google Fonts directly into Tailwind!
+   - Classes like `font-sans`, `font-serif`, `font-mono` use the custom fonts below.
+   - Classes like `text-gold`, `bg-navy`, `border-obsidian` use the brand hex values below.
+   - We even map explicit colors like `#C5A55A` and `#111827` to our variables! This means
+     changing the variables in `:root` will alter EVERY screen and component across both
+     the Public Catalog Website and Executive Admin CMS instantaneously!
+   ============================================================================== */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-sans);
-  --font-mono: var(--font-geist-mono);
-  --font-heading: var(--font-sans);
+  /* Font Family Tokens */
+  --font-sans: var(--font-body, sans-serif);
+  --font-serif: var(--font-heading, serif);
+  --font-display: var(--font-heading, serif);
+  --font-mono: var(--font-mono, monospace);
+  --font-heading: var(--font-heading, serif);
 
-  /* Brand Theme Custom Color Tokens */
+  /* Brand Theme Custom Color Tokens & Dynamic Overrides */
   --color-gold: var(--gold);
   --color-gold-hover: var(--gold-hover);
   --color-navy: var(--navy);
   --color-obsidian: var(--obsidian);
+  --color-bg-dark: var(--bg-dark);
+
+  /* Automatic interception of hardcoded colors to allow central editing */
   --color-[#C5A55A]: var(--gold);
   --color-[#111827]: var(--obsidian);
   --color-[#1A1F36]: var(--navy);
+  --color-[#090909]: var(--bg-dark);
 
+  /* Core UI Tokens */
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -49,6 +67,8 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+
+  /* Radius Scales */
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -58,13 +78,18 @@
   --radius-4xl: calc(var(--radius) * 2.6);
 }
 
-/* 🎨 EASY BRAND COLOR PALETTE (CHANGE HEX CODES HERE ANYTIME) */
+/* ==============================================================================
+   🎨 MASTER COLOR PALETTE — MODIFY THESE HEX CODES TO RECOLOR THE SITE!
+   ============================================================================== */
 :root {
-  --gold: #C5A55A;             /* Championship Gold */
-  --gold-hover: #D5B568;       /* Lighter Gold Accent */
-  --navy: #1A1F36;             /* Royal Navy Blue (Public Theme) */
-  --obsidian: #111827;         /* Dark Obsidian (Admin Theme) */
+  /* Brand Master Colors */
+  --gold: #C5A55A;             /* Primary Gold Accent (Trophies, Buttons, Badges) */
+  --gold-hover: #D5B568;       /* Hover Gold Shade */
+  --navy: #1A1F36;             /* Deep Navy Blue (Public Catalog Hero & Highlights) */
+  --obsidian: #111827;         /* Dark Obsidian (Admin CMS Panels & Cards) */
+  --bg-dark: #090909;          /* Deepest Black-Amber Background */
 
+  /* Light Theme / Public Site Default Surface Colors */
   --background: #FFFFFF;
   --foreground: #111827;
   --card: #FFFFFF;
@@ -84,6 +109,8 @@
   --input: #E5E7EB;
   --ring: #C5A55A;
   --radius: 0.625rem;
+
+  /* Sidebar Tokens */
   --sidebar: #FFFFFF;
   --sidebar-foreground: #111827;
   --sidebar-primary: #C5A55A;
@@ -94,6 +121,7 @@
   --sidebar-ring: #C5A55A;
 }
 
+/* Dark Theme / Admin Portal & Dark Mode Surface Colors */
 .dark {
   --background: #090909;
   --foreground: #F9FAFB;
@@ -123,16 +151,26 @@
   --sidebar-ring: #C5A55A;
 }
 
+/* Base DOM Resets & Default Enhancements */
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--border);
+    outline-color: color-mix(in srgb, var(--ring) 50%, transparent);
   }
 
   body {
-    @apply bg-background text-foreground;
+    background-color: var(--background);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-heading);
   }
 
   html {
-    @apply font-sans;
+    font-family: var(--font-sans);
   }
 }

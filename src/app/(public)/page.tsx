@@ -98,7 +98,7 @@ export default async function HomePage() {
     <div className="w-full bg-black text-[#e5e2e1]">
       
       {/* BEGIN: HeroSection with Reduced Height & Visible Scroll Hint */}
-      <section className="relative h-[70vh] sm:h-[75vh] md:h-[80vh] flex items-center overflow-hidden py-8 md:py-0" data-purpose="hero-banner">
+      <section className="relative h-[55vh] sm:h-[60vh] md:h-[65vh] flex items-center overflow-hidden py-6 md:py-0" data-purpose="hero-banner">
         <div className="absolute inset-0 z-0">
           <Image
             alt="Real Gold Championship Trophy"

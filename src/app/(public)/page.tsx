@@ -14,7 +14,7 @@ export default async function HomePage() {
 
   const phone = profile?.phone || settings?.contact_phone || '+91 98765 43210';
 
-  // 8 Bestsellers featuring local trophy photo assets
+  // 8 Bestsellers using the user's uploaded local trophy assets in /images/trophies/
   const defaultBestsellers = [
     {
       id: 'default-1',
@@ -90,7 +90,26 @@ export default async function HomePage() {
     },
   ];
 
-  const dbProducts = featuredProducts?.products || [];
+  const dbProducts = (featuredProducts?.products || []).map((prod, index) => {
+    // If DB product uses an external URL, map it to local user trophy image
+    const fallbackLocalImages = [
+      '/images/trophies/gold-cup.jpg',
+      '/images/trophies/golden-foot.jpg',
+      '/images/trophies/crystal-star.jpg',
+      '/images/trophies/victory-shield.jpg',
+      '/images/trophies/gold-star.jpg',
+      '/images/trophies/victory-medal.jpg',
+      '/images/trophies/glass-plaque.jpg',
+      '/images/trophies/mahogany-plaque.jpg',
+    ];
+    const originalImg = prod.imageUrl || prod.images?.[0]?.imageUrl;
+    const isExternal = !originalImg || originalImg.startsWith('http');
+    return {
+      ...prod,
+      imageUrl: isExternal ? fallbackLocalImages[index % fallbackLocalImages.length] : originalImg,
+    };
+  });
+
   const displayProducts = dbProducts.length >= 8 
     ? dbProducts.slice(0, 8) 
     : [...dbProducts, ...defaultBestsellers.slice(dbProducts.length, 8)];
@@ -98,12 +117,12 @@ export default async function HomePage() {
   return (
     <div className="w-full bg-black text-[#e5e2e1]">
       
-      {/* BEGIN: HeroSection with Reduced Height & Visible Scroll Hint */}
+      {/* BEGIN: HeroSection with Local Banner Image */}
       <section className="relative h-[55vh] sm:h-[60vh] md:h-[65vh] flex items-center overflow-hidden py-6 md:py-0" data-purpose="hero-banner">
         <div className="absolute inset-0 z-0">
           <Image
             alt="Real Gold Championship Trophy"
-            src="https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=1600&auto=format&fit=crop&q=80"
+            src="/images/trophies/hero-banner.jpg"
             fill
             priority
             className="object-cover object-center"
@@ -219,7 +238,7 @@ export default async function HomePage() {
           
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
             {displayProducts.map((prod: any) => {
-              const img = prod.imageUrl || prod.images?.[0]?.imageUrl || 'https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=800&auto=format&fit=crop&q=80';
+              const img = prod.imageUrl || '/images/trophies/gold-cup.jpg';
               const cat = prod.categoryName || prod.category?.name || 'Prestige Collection';
               const price = prod.priceRange || (prod.pricingMatrix?.[0]?.pricePerPiece ? `₹${prod.pricingMatrix[0].pricePerPiece}` : '$249');
               
@@ -259,7 +278,7 @@ export default async function HomePage() {
       </section>
       {/* END: BestsellersProductGrid */}
 
-      {/* BEGIN: CuratedRanges (Shop by Category with Specific Real Trophy Images) */}
+      {/* BEGIN: CuratedRanges (Using User's Local Trophy Images) */}
       <section className="section-padding bg-black" data-purpose="curated-ranges">
         <div className="container-custom">
           <div className="mb-12 sm:mb-16">
@@ -271,8 +290,8 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <Link href="/catalog?category=Sports" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
               <Image
-                alt="Sports Tournament Gold Trophy Cup"
-                src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&auto=format&fit=crop&q=80"
+                alt="Sports Tournament Trophy"
+                src="/images/trophies/sports-trophy.jpg"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -286,8 +305,8 @@ export default async function HomePage() {
 
             <Link href="/catalog?category=Corporate" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
               <Image
-                alt="Corporate Crystal Award Plaque"
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80"
+                alt="Corporate Crystal Award"
+                src="/images/trophies/corporate-award.jpg"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -301,8 +320,8 @@ export default async function HomePage() {
 
             <Link href="/catalog?category=Academic" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
               <Image
-                alt="Academic Winner Gold Medal"
-                src="https://images.unsplash.com/photo-1589487391730-58f20eb2c308?w=800&auto=format&fit=crop&q=80"
+                alt="Academic Winner Medal"
+                src="/images/trophies/academic-award.jpg"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -320,7 +339,7 @@ export default async function HomePage() {
             <Link href="/catalog?material=Crystal" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
               <Image
                 alt="Optical Crystal Glass Award"
-                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80"
+                src="/images/trophies/crystal-award.jpg"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -334,8 +353,8 @@ export default async function HomePage() {
 
             <Link href="/catalog?material=Wooden" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
               <Image
-                alt="Wooden Trophy Shield Plaque"
-                src="https://images.unsplash.com/photo-1569517282132-25d22f4573e6?w=800&auto=format&fit=crop&q=80"
+                alt="Wooden Trophy Plaque"
+                src="/images/trophies/wooden-award.jpg"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -349,8 +368,8 @@ export default async function HomePage() {
 
             <Link href="/catalog?material=Metal" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
               <Image
-                alt="Metal Championship Winner Medals"
-                src="https://images.unsplash.com/photo-1589487391730-58f20eb2c308?w=800&auto=format&fit=crop&q=80"
+                alt="Metal Winner Medals"
+                src="/images/trophies/victory-medal.jpg"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"

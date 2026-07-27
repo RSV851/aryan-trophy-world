@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, Suspense } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
@@ -19,7 +19,7 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-export default function AdminLoginPage() {
+function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuthStore();
@@ -56,6 +56,70 @@ export default function AdminLoginPage() {
   };
 
   return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-gray-300">
+          Admin Email
+        </Label>
+        <div className="relative">
+          <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+          <Input
+            id="email"
+            type="email"
+            placeholder="owner@aryantrophyworld.com"
+            className="pl-10 bg-[#090909] border-[#C5A55A]/30 text-white placeholder:text-gray-600 focus:border-[#C5A55A] focus:ring-1 focus:ring-[#C5A55A] h-11"
+            disabled={isSubmitting}
+            {...register('email')}
+          />
+        </div>
+        {errors.email && (
+          <p className="text-xs text-rose-400 mt-1">{errors.email.message}</p>
+        )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-gray-300">
+          Password
+        </Label>
+        <div className="relative">
+          <Lock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+          <Input
+            id="password"
+            type="password"
+            placeholder="••••••••"
+            className="pl-10 bg-[#090909] border-[#C5A55A]/30 text-white placeholder:text-gray-600 focus:border-[#C5A55A] focus:ring-1 focus:ring-[#C5A55A] h-11"
+            disabled={isSubmitting}
+            {...register('password')}
+          />
+        </div>
+        {errors.password && (
+          <p className="text-xs text-rose-400 mt-1">{errors.password.message}</p>
+        )}
+      </div>
+
+      <Button
+        type="submit"
+        disabled={isSubmitting}
+        className="w-full h-11 bg-[#C5A55A] hover:bg-[#d5b568] text-[#090909] font-extrabold uppercase tracking-wider text-xs rounded-lg transition-all shadow-[0_0_20px_rgba(197,165,90,0.3)] flex items-center justify-center space-x-2"
+      >
+        {isSubmitting ? (
+          <>
+            <Loader2 className="w-4 h-4 animate-spin" />
+            <span>Authenticating...</span>
+          </>
+        ) : (
+          <>
+            <span>Authenticate & Access</span>
+            <ArrowRight className="w-4 h-4 stroke-[3]" />
+          </>
+        )}
+      </Button>
+    </form>
+  );
+}
+
+export default function AdminLoginPage() {
+  return (
     <div className="min-h-screen w-full flex items-center justify-center bg-[#090909] text-[#e5e2e1] p-4 relative overflow-hidden">
       {/* Luxury Ambient Glow */}
       <div className="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-[#C5A55A]/10 rounded-full blur-[140px] pointer-events-none" />
@@ -74,73 +138,18 @@ export default function AdminLoginPage() {
           </p>
         </div>
 
-        {/* Login Form */}
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-              Admin Email
-            </Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <Input
-                id="email"
-                type="email"
-                placeholder="owner@aryantrophyworld.com"
-                className="pl-10 bg-[#090909] border-[#C5A55A]/30 text-white placeholder:text-gray-600 focus:border-[#C5A55A] focus:ring-1 focus:ring-[#C5A55A] h-11"
-                disabled={isSubmitting}
-                {...register('email')}
-              />
-            </div>
-            {errors.email && (
-              <p className="text-xs text-rose-400 mt-1">{errors.email.message}</p>
-            )}
+        {/* Login Form wrapped in Suspense */}
+        <Suspense fallback={
+          <div className="py-8 flex justify-center text-[#C5A55A]">
+            <Loader2 className="w-6 h-6 animate-spin" />
           </div>
+        }>
+          <LoginForm />
+        </Suspense>
 
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wider text-gray-300">
-              Security Password
-            </Label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
-              <Input
-                id="password"
-                type="password"
-                placeholder="••••••••••••"
-                className="pl-10 bg-[#090909] border-[#C5A55A]/30 text-white placeholder:text-gray-600 focus:border-[#C5A55A] focus:ring-1 focus:ring-[#C5A55A] h-11"
-                disabled={isSubmitting}
-                {...register('password')}
-              />
-            </div>
-            {errors.password && (
-              <p className="text-xs text-rose-400 mt-1">{errors.password.message}</p>
-            )}
-          </div>
-
-          <Button
-            type="submit"
-            disabled={isSubmitting}
-            className="w-full bg-[#C5A55A] hover:bg-[#d5b568] text-[#090909] font-bold uppercase tracking-wider h-12 rounded-lg shadow-[0_0_20px_rgba(197,165,90,0.3)] transition-all flex items-center justify-center space-x-2 text-sm"
-          >
-            {isSubmitting ? (
-              <>
-                <Loader2 className="w-4 h-4 animate-spin" />
-                <span>Verifying Access...</span>
-              </>
-            ) : (
-              <>
-                <span>Sign In to Executive Portal</span>
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
-          </Button>
-        </form>
-
-        {/* Strict Security Disclaimer (No Signup link as per Rule #4) */}
         <div className="mt-8 pt-6 border-t border-gray-800 text-center">
-          <p className="text-[11px] text-gray-500 font-medium tracking-wide">
-            🔒 RESTRICTED BUSINESS OWNER ZONE.
-            <br />
-            No public customer signup allowed. Authorized access only.
+          <p className="text-xs text-gray-500 font-mono">
+            Strictly Private Admin Access • Aryan Trophy World
           </p>
         </div>
       </div>

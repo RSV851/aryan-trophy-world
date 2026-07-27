@@ -7,60 +7,98 @@ export const revalidate = 60; // SSR refresh interval
 
 export default async function HomePage() {
   const [featuredProducts, profile, settings] = await Promise.all([
-    getPublicProducts({ isFeatured: true, limit: 4 }),
+    getPublicProducts({ isFeatured: true, limit: 8 }),
     getPublicOwnerProfile(),
     getPublicSettingsMap(),
   ]);
 
   const phone = profile?.phone || settings?.contact_phone || '+91 98765 43210';
 
-  // Fallback items featuring real, high-resolution trophy & award images
+  // 8 Bestsellers featuring verified real trophy & award photos from Unsplash
+  const defaultBestsellers = [
+    {
+      id: '1',
+      slug: 'champion-gold-cup',
+      name: 'Champion Gold Cup',
+      sku: 'AT-C01',
+      priceRange: '₹18,499 ($249)',
+      categoryName: 'Polished Metal & Mahogany',
+      imageUrl: 'https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=800&auto=format&fit=crop&q=80',
+    },
+    {
+      id: '2',
+      slug: 'golden-foot-award',
+      name: 'Golden Foot Sports Award',
+      sku: 'AT-S02',
+      priceRange: '₹9,499 ($125)',
+      categoryName: 'Professional Sports Series',
+      imageUrl: 'https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&auto=format&fit=crop&q=80',
+    },
+    {
+      id: '3',
+      slug: 'crystal-pinnacle',
+      name: 'Crystal Pinnacle Star',
+      sku: 'AT-CP03',
+      priceRange: '₹22,999 ($310)',
+      categoryName: 'Optical K9 Crystal',
+      imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80',
+    },
+    {
+      id: '4',
+      slug: 'radiant-shield',
+      name: 'Radiant Victory Shield',
+      sku: 'AT-RS04',
+      priceRange: '₹14,299 ($189)',
+      categoryName: 'Traditional Team Honors',
+      imageUrl: 'https://images.unsplash.com/photo-1569517282132-25d22f4573e6?w=800&auto=format&fit=crop&q=80',
+    },
+    {
+      id: '5',
+      slug: 'gold-star-trophy',
+      name: 'Leadership Gold Star Trophy',
+      sku: 'AT-GS05',
+      priceRange: '₹12,999 ($165)',
+      categoryName: 'Executive Excellence',
+      imageUrl: 'https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=800&auto=format&fit=crop&q=80',
+    },
+    {
+      id: '6',
+      slug: 'olympic-victory-medal',
+      name: 'Olympic Championship Medal',
+      sku: 'AT-M06',
+      priceRange: '₹4,999 ($65)',
+      categoryName: 'Solid Brass & Cast Gold',
+      imageUrl: 'https://images.unsplash.com/photo-1589487391730-58f20eb2c308?w=800&auto=format&fit=crop&q=80',
+    },
+    {
+      id: '7',
+      slug: 'corporate-glass-plaque',
+      name: 'Corporate Glass Plaque',
+      sku: 'AT-GP07',
+      priceRange: '₹16,499 ($215)',
+      categoryName: 'Laser-Engraved Crystal',
+      imageUrl: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80',
+    },
+    {
+      id: '8',
+      slug: 'mahogany-honor-wooden',
+      name: 'Mahogany Honor Plaque',
+      sku: 'AT-MP08',
+      priceRange: '₹11,499 ($149)',
+      categoryName: 'Rosewood & Brass Casing',
+      imageUrl: 'https://images.unsplash.com/photo-1569517282132-25d22f4573e6?w=800&auto=format&fit=crop&q=80',
+    },
+  ];
+
   const displayProducts = featuredProducts?.products && featuredProducts.products.length > 0 
-    ? featuredProducts.products.slice(0, 4) 
-    : [
-        {
-          id: '1',
-          slug: 'champion-gold-cup',
-          name: 'Champion Gold Cup',
-          sku: 'AT-C01',
-          priceRange: '₹18,499 ($249)',
-          categoryName: 'Polished Metal & Mahogany',
-          imageUrl: 'https://images.unsplash.com/photo-1578269174936-2709b6aeb913?w=800&auto=format&fit=crop&q=80',
-        },
-        {
-          id: '2',
-          slug: 'golden-foot-award',
-          name: 'Golden Foot Sports Award',
-          sku: 'AT-S02',
-          priceRange: '₹9,499 ($125)',
-          categoryName: 'Professional Sports Series',
-          imageUrl: 'https://images.unsplash.com/photo-1569517282132-25d22f4573e6?w=800&auto=format&fit=crop&q=80',
-        },
-        {
-          id: '3',
-          slug: 'crystal-pinnacle',
-          name: 'Crystal Pinnacle Star',
-          sku: 'AT-CP03',
-          priceRange: '₹22,999 ($310)',
-          categoryName: 'Optical K9 Crystal',
-          imageUrl: 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80',
-        },
-        {
-          id: '4',
-          slug: 'radiant-shield',
-          name: 'Radiant Victory Shield',
-          sku: 'AT-RS04',
-          priceRange: '₹14,299 ($189)',
-          categoryName: 'Traditional Team Honors',
-          imageUrl: 'https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800&auto=format&fit=crop&q=80',
-        },
-      ];
+    ? featuredProducts.products.slice(0, 8) 
+    : defaultBestsellers;
 
   return (
     <div className="w-full bg-black text-[#e5e2e1]">
       
-      {/* BEGIN: HeroSection */}
-      <section className="relative min-h-[85vh] md:min-h-[90vh] flex items-center overflow-hidden py-12 md:py-0" data-purpose="hero-banner">
+      {/* BEGIN: HeroSection with Reduced Height & Visible Scroll Hint */}
+      <section className="relative h-[70vh] sm:h-[75vh] md:h-[80vh] flex items-center overflow-hidden py-8 md:py-0" data-purpose="hero-banner">
         <div className="absolute inset-0 z-0">
           <Image
             alt="Real Gold Championship Trophy"
@@ -73,34 +111,40 @@ export default async function HomePage() {
         </div>
         
         <div className="container-custom relative z-10 text-center w-full">
-          <p className="text-[#f2ca50] font-sans font-semibold uppercase tracking-[0.25em] sm:tracking-[0.3em] text-[10px] sm:text-xs mb-4 sm:mb-6">
+          <p className="text-[#f2ca50] font-sans font-semibold uppercase tracking-[0.25em] sm:tracking-[0.3em] text-[10px] sm:text-xs mb-3 sm:mb-4">
             Exclusive Engraving & Bespoke Crafting
           </p>
           
-          {/* Responsive Responsive Banner Headline */}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-8xl font-display font-light mb-6 md:mb-8 leading-[1.15] text-white tracking-tight max-w-5xl mx-auto">
+          {/* Responsive Banner Headline */}
+          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-light mb-4 md:mb-6 leading-[1.15] text-white tracking-tight max-w-4xl mx-auto">
             Every trophy tells a <br className="hidden sm:inline" />
             <span className="italic font-normal text-[#f2ca50]">story worth engraving.</span>
           </h1>
           
-          <p className="text-xs sm:text-base md:text-lg font-sans text-white/70 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed px-2">
+          <p className="text-xs sm:text-sm md:text-base font-sans text-white/70 max-w-xl mx-auto mb-6 sm:mb-8 leading-relaxed px-2">
             Complimentary custom engraving on every award. Handcrafted for tournaments, corporate honors, and champions.
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-5 max-w-md mx-auto sm:max-w-none">
-            <Link href="/catalog" className="btn-primary w-full sm:w-auto px-8 sm:px-12 py-3.5 sm:py-4 font-semibold rounded-full uppercase tracking-widest text-[10px] sm:text-[11px] text-center">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-md mx-auto sm:max-w-none">
+            <Link href="/catalog" className="btn-primary w-full sm:w-auto px-8 sm:px-10 py-3 font-semibold rounded-full uppercase tracking-widest text-[10px] sm:text-[11px] text-center">
               Browse Collection
             </Link>
-            <Link href="/contact" className="btn-secondary-glass w-full sm:w-auto px-8 sm:px-12 py-3.5 sm:py-4 font-semibold rounded-full uppercase tracking-widest text-[10px] sm:text-[11px] text-center">
+            <Link href="/contact" className="btn-secondary-glass w-full sm:w-auto px-8 sm:px-10 py-3 font-semibold rounded-full uppercase tracking-widest text-[10px] sm:text-[11px] text-center">
               Send Inquiry
             </Link>
           </div>
 
-          <div className="mt-12 sm:mt-16 flex flex-wrap items-center justify-center gap-4 sm:gap-8 md:gap-12 text-[9px] sm:text-[10px] text-white/50 font-semibold uppercase tracking-[0.2em]">
+          <div className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-[9px] sm:text-[10px] text-white/50 font-semibold uppercase tracking-[0.2em]">
             <span className="flex items-center gap-1.5"><span className="text-[#f2ca50]">★</span> 200+ Reviews</span>
             <span className="flex items-center gap-1.5"><span className="text-[#f2ca50]">★</span> 15+ Years Exp</span>
             <span className="flex items-center gap-1.5"><span className="text-[#f2ca50]">★</span> 2000+ Projects</span>
           </div>
+        </div>
+
+        {/* Scroll Down Hint Indicator */}
+        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-0.5 text-white/50 text-[9px] uppercase tracking-[0.2em] pointer-events-none">
+          <span>Scroll to explore</span>
+          <span className="material-symbols-outlined text-base animate-bounce text-[#f2ca50]">keyboard_arrow_down</span>
         </div>
       </section>
       {/* END: HeroSection */}
@@ -108,10 +152,10 @@ export default async function HomePage() {
       {/* BEGIN: OccasionCategories */}
       <section className="section-padding bg-black" data-purpose="categories-grid">
         <div className="container-custom">
-          <div className="text-center mb-12 sm:mb-16 md:mb-20">
+          <div className="text-center mb-12 sm:mb-16">
             <p className="text-[#f2ca50] uppercase tracking-[0.2em] text-[10px] font-semibold mb-3">Our Collections</p>
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-light text-white">A trophy for every occasion.</h2>
-            <p className="text-white/50 mt-4 sm:mt-6 max-w-xl mx-auto text-xs sm:text-sm leading-relaxed">
+            <p className="text-white/50 mt-4 max-w-xl mx-auto text-xs sm:text-sm leading-relaxed">
               Explore our curated ranges meticulously designed for sports tournaments, corporate galas, and scholastic honors.
             </p>
           </div>
@@ -159,7 +203,7 @@ export default async function HomePage() {
       </section>
       {/* END: OccasionCategories */}
 
-      {/* BEGIN: BestsellersProductGrid */}
+      {/* BEGIN: BestsellersProductGrid (8 Cards) */}
       <section className="section-padding bg-[#0a0a0a]" data-purpose="product-grid">
         <div className="container-custom">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 sm:mb-16 gap-4">
@@ -168,7 +212,7 @@ export default async function HomePage() {
               <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-light text-white">Bestsellers this season.</h2>
             </div>
             <Link href="/catalog" className="text-[#2563eb] text-[11px] font-bold uppercase tracking-widest border-b border-[#2563eb]/30 hover:border-[#2563eb] transition-all pb-1 self-start sm:self-auto">
-              View All Products
+              View All Products ({displayProducts.length})
             </Link>
           </div>
           
@@ -192,15 +236,15 @@ export default async function HomePage() {
                       className="object-cover transition-transform duration-700 group-hover:scale-105"
                     />
                   </Link>
-                  <div className="p-6 sm:p-8 flex-1 flex flex-col justify-between">
+                  <div className="p-6 flex-1 flex flex-col justify-between">
                     <div>
                       <Link href={`/products/${prod.slug || prod.id}`}>
-                        <h3 className="text-lg sm:text-xl font-display text-white mb-2 hover:text-[#f2ca50] transition-colors">{prod.name}</h3>
+                        <h3 className="text-lg font-display text-white mb-2 hover:text-[#f2ca50] transition-colors">{prod.name}</h3>
                       </Link>
-                      <p className="text-white/40 text-[10px] sm:text-[11px] uppercase tracking-wider mb-6">{cat}</p>
+                      <p className="text-white/40 text-[10px] uppercase tracking-wider mb-6">{cat}</p>
                     </div>
-                    <div className="flex items-center justify-between pt-4 sm:pt-6 border-t border-white/5">
-                      <span className="text-white font-semibold text-base sm:text-lg">{price}</span>
+                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
+                      <span className="text-white font-semibold text-base">{price}</span>
                       <Link href={`/products/${prod.slug || prod.id}`} className="text-[#f2ca50] text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors">
                         Inquiry
                       </Link>
@@ -214,7 +258,7 @@ export default async function HomePage() {
       </section>
       {/* END: BestsellersProductGrid */}
 
-      {/* BEGIN: CuratedRanges (Shop by Category) */}
+      {/* BEGIN: CuratedRanges (Shop by Category with Specific Real Trophy Images) */}
       <section className="section-padding bg-black" data-purpose="curated-ranges">
         <div className="container-custom">
           <div className="mb-12 sm:mb-16">
@@ -226,8 +270,8 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
             <Link href="/catalog?category=Sports" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
               <Image
-                alt="Sports Tournament Gold Trophy"
-                src="https://images.unsplash.com/photo-1569517282132-25d22f4573e6?w=800&auto=format&fit=crop&q=80"
+                alt="Sports Tournament Gold Trophy Cup"
+                src="https://images.unsplash.com/photo-1579952363873-27f3bade9f55?w=800&auto=format&fit=crop&q=80"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -241,8 +285,8 @@ export default async function HomePage() {
 
             <Link href="/catalog?category=Corporate" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
               <Image
-                alt="Corporate Crystal Award Monument"
-                src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=800&auto=format&fit=crop&q=80"
+                alt="Corporate Crystal Award Plaque"
+                src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -256,8 +300,8 @@ export default async function HomePage() {
 
             <Link href="/catalog?category=Academic" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
               <Image
-                alt="Academic Winner Medal"
-                src="https://images.unsplash.com/photo-1614036417651-efe5912149d8?w=800&auto=format&fit=crop&q=80"
+                alt="Academic Winner Gold Medal"
+                src="https://images.unsplash.com/photo-1589487391730-58f20eb2c308?w=800&auto=format&fit=crop&q=80"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -274,7 +318,7 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <Link href="/catalog?material=Crystal" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
               <Image
-                alt="Optical Crystal Trophy"
+                alt="Optical Crystal Glass Award"
                 src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&auto=format&fit=crop&q=80"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
@@ -289,8 +333,8 @@ export default async function HomePage() {
 
             <Link href="/catalog?material=Wooden" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
               <Image
-                alt="Mahogany Wooden Trophy Plaque"
-                src="https://images.unsplash.com/photo-1513519245088-0e12902e5a38?w=800&auto=format&fit=crop&q=80"
+                alt="Wooden Trophy Shield Plaque"
+                src="https://images.unsplash.com/photo-1569517282132-25d22f4573e6?w=800&auto=format&fit=crop&q=80"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"
                 className="object-cover transition-transform duration-700 group-hover:scale-110"
@@ -304,7 +348,7 @@ export default async function HomePage() {
 
             <Link href="/catalog?material=Metal" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
               <Image
-                alt="Metal Winner Tournament Medals"
+                alt="Metal Championship Winner Medals"
                 src="https://images.unsplash.com/photo-1589487391730-58f20eb2c308?w=800&auto=format&fit=crop&q=80"
                 fill
                 sizes="(max-width: 768px) 100vw, 33vw"

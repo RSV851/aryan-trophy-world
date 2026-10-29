@@ -8,7 +8,7 @@ export const metadata: Metadata = {
   description: 'Visit our Mumbai atelier or contact our executive specialists for custom corporate trophy designing, wholesale tournament medals, and brand engraving.',
 };
 
-export const revalidate = 60; // SSR refresh interval
+export const dynamic = 'force-dynamic'; // SSR refresh interval
 
 export default async function ContactPage() {
   const [profile, settings, productsData] = await Promise.all([

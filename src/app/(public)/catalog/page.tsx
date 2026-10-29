@@ -9,7 +9,7 @@ export const metadata: Metadata = {
   description: 'Discover our curated selection of bespoke luxury awards, championship trophies, medals, and crystal monuments crafted with unparalleled precision.',
 };
 
-export const revalidate = 30; // SSR revalidation
+export const dynamic = 'force-dynamic'; // SSR revalidation
 
 export default async function CatalogPage({
   searchParams,

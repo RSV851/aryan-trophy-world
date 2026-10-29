@@ -3,7 +3,7 @@ import { Navbar } from '@/components/public/navbar';
 import { Footer } from '@/components/public/footer';
 import { getPublicSettingsMap, getPublicOwnerProfile, getPublicCategories } from '@/lib/data/public-catalog';
 
-export const revalidate = 60; // Standard Next.js server cache
+export const dynamic = 'force-dynamic'; // Standard Next.js server cache
 
 export default async function PublicLayout({
   children,

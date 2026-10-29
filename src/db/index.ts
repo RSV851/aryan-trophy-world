@@ -18,7 +18,7 @@ const globalForDb = globalThis as unknown as {
 
 const client =
   globalForDb.conn ??
-  postgres(connectionString, { prepare: false, max: 3, idle_timeout: 20 });
+  postgres(connectionString, { prepare: false, max: 10, idle_timeout: 20, connect_timeout: 10 });
 
 if (process.env.NODE_ENV !== "production") globalForDb.conn = client;
 

@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   description: 'Learn about Aryan Trophy World’s 15+ years of excellence in high-precision corporate awards, tournament medals, and optical crystal monuments.',
 };
 
-export const revalidate = 60; // SSR refresh interval
+export const dynamic = 'force-dynamic'; // SSR refresh interval
 
 export default async function AboutPage() {
   const [profile, settings] = await Promise.all([

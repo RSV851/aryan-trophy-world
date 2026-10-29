@@ -63,8 +63,9 @@ export default function AdminInquiriesPage() {
         const json = await res.json();
         const items = json.data?.items || json.data || [];
         setInquiries(Array.isArray(items) ? items : []);
-        setTotalPages(json.data?.pagination?.totalPages || 1);
-        setTotalItems(json.data?.pagination?.totalItems || (Array.isArray(items) ? items.length : 0));
+        const paginationObj = json.pagination || json.data?.pagination || {};
+        setTotalPages(paginationObj.totalPages || 1);
+        setTotalItems(paginationObj.total || paginationObj.totalItems || (Array.isArray(items) ? items.length : 0));
       } else {
         toast.error('Failed to sync customer leads from database.');
       }
@@ -257,6 +258,16 @@ export default function AdminInquiriesPage() {
             Review incoming bulk quote submissions, update lead conversation pipelines, and record private negotiation remarks.
           </p>
         </div>
+
+        <Link href="/admin/settings">
+          <Button
+            variant="outline"
+            className="border-gray-700 bg-gray-800 hover:bg-gray-700 text-[#C5A55A] font-bold text-xs flex items-center space-x-2 shrink-0 shadow-md"
+          >
+            <Filter className="w-4 h-4" />
+            <span>Manage Inquiry Subjects</span>
+          </Button>
+        </Link>
       </div>
 
       {/* Status Tabs Navigation Bar */}

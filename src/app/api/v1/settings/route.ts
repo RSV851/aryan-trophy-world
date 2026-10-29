@@ -1,4 +1,5 @@
 import { NextRequest } from "next/server";
+import { revalidatePath } from "next/cache";
 import { db } from "@/db";
 import { settings } from "@/db/schema";
 import { updateSettingSchema } from "@/lib/validations";
@@ -59,9 +60,9 @@ export async function PUT(request: NextRequest) {
     const updates = Array.isArray(parsed.data) ? parsed.data : [parsed.data];
     const results: any[] = [];
 
-    // Perform upsert (insert or update on duplicate key) in transaction
+    // Perform upsert (insert or update on duplicate key) in transaction with Promise.all
     await db.transaction(async (tx) => {
-      for (const item of updates) {
+      const upsertItem = async (item: typeof updates[0]) => {
         const existing = await tx
           .select({ id: settings.id })
           .from(settings)
@@ -69,6 +70,27 @@ export async function PUT(request: NextRequest) {
           .limit(1);
 
         if (existing.length > 0) {
+          // Auto-delete replaced old image from Supabase Storage
+          const [oldSetting] = await tx.select().from(settings).where(eq(settings.key, item.key)).limit(1);
+          const oldVal = typeof oldSetting?.value === 'string' ? oldSetting.value : '';
+          const newVal = typeof item.value === 'string' ? item.value : '';
+
+          if (oldVal && newVal && oldVal !== newVal && oldVal.includes('/branding/')) {
+            try {
+              const filename = oldVal.split('/branding/').pop()?.split('?')[0];
+              const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+              const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+              if (filename && supabaseUrl && serviceRoleKey) {
+                const { createClient } = await import('@supabase/supabase-js');
+                const supabase = createClient(supabaseUrl, serviceRoleKey);
+                await supabase.storage.from('branding').remove([filename]);
+                console.log(`✓ Automatically deleted replaced old ${item.key} from Supabase Storage:`, filename);
+              }
+            } catch (err) {
+              console.error('Failed to cleanup old setting file:', err);
+            }
+          }
+
           const [updated] = await tx
             .update(settings)
             .set({
@@ -78,7 +100,7 @@ export async function PUT(request: NextRequest) {
             })
             .where(eq(settings.key, item.key))
             .returning();
-          results.push(updated);
+          return updated;
         } else {
           const [created] = await tx
             .insert(settings)
@@ -88,10 +110,20 @@ export async function PUT(request: NextRequest) {
               value: item.value,
             })
             .returning();
-          results.push(created);
+          return created;
         }
-      }
+      };
+
+      const res = await Promise.all(updates.map((item) => upsertItem(item)));
+      results.push(...res);
     });
+
+    try {
+      revalidatePath('/', 'layout');
+      revalidatePath('/admin', 'layout');
+    } catch {
+      // Ignore cache revalidation errors
+    }
 
     return successResponse(results, "Settings updated successfully");
   } catch (error: any) {

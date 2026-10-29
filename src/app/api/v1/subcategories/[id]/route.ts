@@ -4,6 +4,7 @@ import { subcategories, products } from "@/db/schema";
 import { updateSubcategorySchema } from "@/lib/validations";
 import { generateSlug } from "@/lib/utils/slug";
 import { successResponse, errorResponse } from "@/lib/utils/api-response";
+import { executeWithVaultAuth } from "@/lib/db/vault-session";
 import { eq, count } from "drizzle-orm";
 
 interface Params {
@@ -105,7 +106,9 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       );
     }
 
-    await db.delete(subcategories).where(eq(subcategories.id, id));
+    await executeWithVaultAuth(async () => {
+      await db.delete(subcategories).where(eq(subcategories.id, id));
+    });
 
     return successResponse(null, "Subcategory deleted successfully");
   } catch (error: any) {

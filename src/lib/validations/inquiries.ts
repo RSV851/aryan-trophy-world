@@ -4,8 +4,10 @@ import { paginationQuerySchema } from "./common";
 export const inquiryStatusEnum = z.enum(["new", "read", "replied", "closed"]);
 
 export const inquiryProductItemSchema = z.object({
-  productId: z.string().uuid("Invalid product ID"),
+  productId: z.string().min(1, "Product ID is required"),
   quantity: z.coerce.number().int().min(1, "Quantity must be at least 1").default(1),
+  name: z.string().optional().nullable(),
+  sku: z.string().optional().nullable(),
 });
 
 export const createInquirySchema = z.object({

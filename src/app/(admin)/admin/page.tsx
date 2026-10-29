@@ -27,7 +27,6 @@ interface DashboardStats {
   productsCount: number;
   inquiriesCount: number;
   newInquiriesCount: number;
-  mediaCount: number;
   categoriesCount: number;
 }
 
@@ -48,7 +47,6 @@ export default function AdminDashboardPage() {
     productsCount: 0,
     inquiriesCount: 0,
     newInquiriesCount: 0,
-    mediaCount: 0,
     categoriesCount: 0,
   });
   const [recentInquiries, setRecentInquiries] = useState<RecentInquiry[]>([]);
@@ -56,51 +54,22 @@ export default function AdminDashboardPage() {
   const fetchDashboardData = async () => {
     setLoading(true);
     try {
-      // Fetch endpoints concurrently
-      const [prodRes, inqRes, mediaRes, catRes] = await Promise.all([
-        fetch('/api/v1/products?page=1&limit=1').catch(() => null),
-        fetch('/api/v1/inquiries?page=1&limit=5').catch(() => null),
-        fetch('/api/v1/media?page=1&limit=1').catch(() => null),
-        fetch('/api/v1/categories?page=1&limit=1').catch(() => null),
-      ]);
-
-      let prodTotal = 0;
-      if (prodRes?.ok) {
-        const json = await prodRes.json();
-        prodTotal = json.data?.pagination?.totalItems || json.data?.items?.length || 0;
+      const res = await fetch('/api/v1/admin/dashboard', { cache: 'no-store' });
+      if (res.ok) {
+        const json = await res.json();
+        const data = json.data;
+        if (data) {
+          setStats(data.stats || {
+            productsCount: 0,
+            inquiriesCount: 0,
+            newInquiriesCount: 0,
+            categoriesCount: 0,
+          });
+          setRecentInquiries(data.recentInquiries || []);
+        }
+      } else {
+        toast.error('Failed to connect to real-time DB analytics engine.');
       }
-
-      let inqTotal = 0;
-      let newInq = 0;
-      let latestInquiries: RecentInquiry[] = [];
-      if (inqRes?.ok) {
-        const json = await inqRes.json();
-        const items: RecentInquiry[] = json.data?.items || json.data || [];
-        inqTotal = json.data?.pagination?.totalItems || items.length;
-        newInq = items.filter((i) => i.status === 'new').length;
-        latestInquiries = items.slice(0, 5);
-      }
-
-      let mediaTotal = 0;
-      if (mediaRes?.ok) {
-        const json = await mediaRes.json();
-        mediaTotal = json.data?.pagination?.totalItems || json.data?.items?.length || 0;
-      }
-
-      let catTotal = 0;
-      if (catRes?.ok) {
-        const json = await catRes.json();
-        catTotal = json.data?.pagination?.totalItems || json.data?.items?.length || 0;
-      }
-
-      setStats({
-        productsCount: prodTotal,
-        inquiriesCount: inqTotal,
-        newInquiriesCount: newInq,
-        mediaCount: mediaTotal,
-        categoriesCount: catTotal,
-      });
-      setRecentInquiries(latestInquiries);
     } catch {
       toast.error('Failed to load complete dashboard diagnostics.');
     } finally {
@@ -146,21 +115,21 @@ export default function AdminDashboardPage() {
   };
 
   return (
-    <div className="space-y-8 max-w-7xl mx-auto">
+    <div className="space-y-6 mobile-mid:space-y-8 max-w-7xl mx-auto">
       {/* Welcome Banner */}
-      <div className="bg-[#111827]/90 border border-gray-800 rounded-2xl p-6 sm:p-8 shadow-xl relative overflow-hidden">
+      <div className="bg-[#111827]/90 border border-gray-800 rounded-2xl p-4 mobile-mid:p-5 phablet:p-6 sm:p-8 shadow-xl relative overflow-hidden">
         <div className="absolute right-0 top-0 w-80 h-80 bg-[#C5A55A]/5 rounded-full blur-[100px] pointer-events-none" />
         
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 relative z-10">
-          <div className="space-y-2">
-            <div className="inline-flex items-center space-x-2 px-3 py-1 rounded-full bg-[#C5A55A]/15 border border-[#C5A55A]/30 text-[#C5A55A] text-xs font-semibold">
-              <Sparkles className="w-3.5 h-3.5" />
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mobile-mid:gap-4 relative z-10">
+          <div className="space-y-1.5 mobile-mid:space-y-2">
+            <div className="inline-flex items-center space-x-2 px-2.5 py-1 rounded-full bg-[#C5A55A]/15 border border-[#C5A55A]/30 text-[#C5A55A] text-[10px] mobile-mid:text-xs font-semibold">
+              <Sparkles className="w-3 h-3 mobile-mid:w-3.5 mobile-mid:h-3.5" />
               <span>Executive Showroom Dashboard</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-serif">
+            <h1 className="text-xl mobile-mid:text-2xl sm:text-3xl font-extrabold text-white tracking-tight font-serif">
               Welcome back, {profile?.name || 'Executive Admin'}
             </h1>
-            <p className="text-sm text-gray-400 max-w-2xl">
+            <p className="text-xs mobile-mid:text-sm text-gray-400 max-w-2xl">
               Monitor customer quotes, manage state-of-the-art trophy collections, and oversee live catalog performance in real time.
             </p>
           </div>
@@ -169,7 +138,7 @@ export default function AdminDashboardPage() {
             onClick={fetchDashboardData}
             variant="outline"
             size="sm"
-            className="border-gray-700 bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs flex items-center space-x-2 shrink-0 h-10 px-4"
+            className="border-gray-700 bg-gray-800 hover:bg-gray-700 text-gray-200 text-[10px] mobile-mid:text-xs flex items-center space-x-2 shrink-0 h-9 mobile-mid:h-10 px-3 mobile-mid:px-4"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             <span>Refresh Diagnostics</span>
@@ -178,7 +147,7 @@ export default function AdminDashboardPage() {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 phablet:grid-cols-2 lg:grid-cols-4 gap-3 mobile-mid:gap-4 sm:gap-6">
         <StatsCard
           title="Active Catalog Trophies"
           value={stats.productsCount}
@@ -203,22 +172,14 @@ export default function AdminDashboardPage() {
           accentColor="blue"
           isLoading={loading}
         />
-        <StatsCard
-          title="Media Assets Recorded"
-          value={stats.mediaCount}
-          subtitle="Optimized WebP library"
-          icon={ImageIcon}
-          accentColor="purple"
-          isLoading={loading}
-        />
       </div>
 
       {/* Quick Actions Bar */}
-      <div className="space-y-4">
-        <h2 className="text-sm font-bold uppercase tracking-wider text-gray-400 font-serif">
+      <div className="space-y-3 mobile-mid:space-y-4">
+        <h2 className="text-xs mobile-mid:text-sm font-bold uppercase tracking-wider text-gray-400 font-serif">
           ⚡ Quick Management Actions
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="grid grid-cols-1 phablet:grid-cols-2 lg:grid-cols-4 gap-3 mobile-mid:gap-4">
           <Link href="/admin/products?action=new">
             <div className="bg-[#111827]/70 hover:bg-[#111827] border border-[#C5A55A]/30 hover:border-[#C5A55A] rounded-xl p-4 transition-all group flex items-center justify-between cursor-pointer shadow-sm">
               <div className="flex items-center space-x-3">
@@ -329,7 +290,7 @@ export default function AdminDashboardPage() {
                   </div>
                   <p className="text-xs text-gray-400 font-mono">{inquiry.email}</p>
                   <p className="text-[11px] text-gray-500">
-                    Requested <strong className="text-[#C5A55A]">{inquiry.products?.length || 1} trophy item(s)</strong> •{' '}
+                    Requested <strong className="text-[#C5A55A]">{inquiry.products?.length || 0} trophy item(s)</strong> •{' '}
                     {new Date(inquiry.createdAt).toLocaleDateString()} at {new Date(inquiry.createdAt).toLocaleTimeString()}
                   </p>
                 </div>

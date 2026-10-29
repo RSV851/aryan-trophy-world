@@ -4,6 +4,7 @@ import { productTypes, products } from "@/db/schema";
 import { updateProductTypeSchema } from "@/lib/validations";
 import { generateSlug } from "@/lib/utils/slug";
 import { successResponse, errorResponse } from "@/lib/utils/api-response";
+import { executeWithVaultAuth } from "@/lib/db/vault-session";
 import { eq, count } from "drizzle-orm";
 
 interface Params {
@@ -78,7 +79,9 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       );
     }
 
-    await db.delete(productTypes).where(eq(productTypes.id, id));
+    await executeWithVaultAuth(async () => {
+      await db.delete(productTypes).where(eq(productTypes.id, id));
+    });
     return successResponse(null, "Product type deleted successfully");
   } catch (error: any) {
     return errorResponse("Failed to delete product type", 500, error.message);

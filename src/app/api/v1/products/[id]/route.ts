@@ -2,6 +2,7 @@ import { NextRequest } from "next/server";
 import { db } from "@/db";
 import { 
   products, 
+  collections,
   productMaterials, 
   productThemes, 
   productShapes, 
@@ -132,6 +133,7 @@ export async function PUT(
           ...(data.typeId !== undefined && { typeId: data.typeId }),
           ...(data.sizeUnit !== undefined && { sizeUnit: data.sizeUnit }),
           ...(data.isFeatured !== undefined && { isFeatured: data.isFeatured }),
+          ...(data.isBestseller !== undefined && { isBestseller: data.isBestseller }),
           ...(data.isActive !== undefined && { isActive: data.isActive }),
           ...(data.seoTitle !== undefined && { seoTitle: data.seoTitle }),
           ...(data.seoDescription !== undefined && { seoDescription: data.seoDescription }),
@@ -143,67 +145,141 @@ export async function PUT(
         .where(eq(products.id, id))
         .returning();
 
-      // 2. Replace Materials if supplied
+      // 2. Parallel Replacement Tasks for independent junction & child entities
+      const tasks: Promise<any>[] = [];
+
+      // Replace Materials
       if (data.materialIds !== undefined) {
-        await tx.delete(productMaterials).where(eq(productMaterials.productId, id));
-        if (data.materialIds.length > 0) {
-          await tx.insert(productMaterials).values(
-            data.materialIds.map((matId) => ({ productId: id, materialId: matId }))
-          );
-        }
+        tasks.push(
+          (async () => {
+            await tx.delete(productMaterials).where(eq(productMaterials.productId, id));
+            if (data.materialIds!.length > 0) {
+              await tx.insert(productMaterials).values(
+                data.materialIds!.map((matId) => ({ productId: id, materialId: matId }))
+              );
+            }
+          })()
+        );
       }
 
-      // 3. Replace Themes if supplied
+      // Replace Themes
       if (data.themeIds !== undefined) {
-        await tx.delete(productThemes).where(eq(productThemes.productId, id));
-        if (data.themeIds.length > 0) {
-          await tx.insert(productThemes).values(
-            data.themeIds.map((thmId) => ({ productId: id, themeId: thmId }))
-          );
-        }
+        tasks.push(
+          (async () => {
+            await tx.delete(productThemes).where(eq(productThemes.productId, id));
+            if (data.themeIds!.length > 0) {
+              await tx.insert(productThemes).values(
+                data.themeIds!.map((thmId) => ({ productId: id, themeId: thmId }))
+              );
+            }
+          })()
+        );
       }
 
-      // 4. Replace Shapes if supplied
+      // Replace Shapes
       if (data.shapeIds !== undefined) {
-        await tx.delete(productShapes).where(eq(productShapes.productId, id));
-        if (data.shapeIds.length > 0) {
-          await tx.insert(productShapes).values(
-            data.shapeIds.map((shpId) => ({ productId: id, shapeId: shpId }))
-          );
-        }
+        tasks.push(
+          (async () => {
+            await tx.delete(productShapes).where(eq(productShapes.productId, id));
+            if (data.shapeIds!.length > 0) {
+              await tx.insert(productShapes).values(
+                data.shapeIds!.map((shpId) => ({ productId: id, shapeId: shpId }))
+              );
+            }
+          })()
+        );
       }
 
-      // 5. Replace Collections if supplied
-      if (data.collectionIds !== undefined) {
-        await tx.delete(productCollections).where(eq(productCollections.productId, id));
-        if (data.collectionIds.length > 0) {
-          await tx.insert(productCollections).values(
-            data.collectionIds.map((colId) => ({ productId: id, collectionId: colId }))
-          );
-        }
+      // Replace Collections with Auto-Sync for Featured & Best Sellers
+      if (data.collectionIds !== undefined || data.isFeatured !== undefined || data.isBestseller !== undefined) {
+        tasks.push(
+          (async () => {
+            let currentCols = await tx.select({ collectionId: productCollections.collectionId }).from(productCollections).where(eq(productCollections.productId, id));
+            let targetColIds = data.collectionIds !== undefined ? [...data.collectionIds] : currentCols.map((c) => c.collectionId);
+
+            const activeFeatured = data.isFeatured !== undefined ? data.isFeatured : updated.isFeatured;
+            const activeBestseller = data.isBestseller !== undefined ? data.isBestseller : updated.isBestseller;
+
+            const [featCol, bestCol] = await Promise.all([
+              tx.select().from(collections).where(eq(collections.slug, 'featured')).limit(1).then((res) => res[0]),
+              tx.select().from(collections).where(eq(collections.slug, 'best-sellers')).limit(1).then((res) => res[0]),
+            ]);
+
+            if (featCol) {
+              if (activeFeatured && !targetColIds.includes(featCol.id)) {
+                targetColIds.push(featCol.id);
+              } else if (!activeFeatured) {
+                targetColIds = targetColIds.filter((cid) => cid !== featCol.id);
+              }
+            }
+
+            if (bestCol) {
+              if (activeBestseller && !targetColIds.includes(bestCol.id)) {
+                targetColIds.push(bestCol.id);
+              } else if (!activeBestseller) {
+                targetColIds = targetColIds.filter((cid) => cid !== bestCol.id);
+              }
+            }
+
+            await tx.delete(productCollections).where(eq(productCollections.productId, id));
+            if (targetColIds.length > 0) {
+              await tx.insert(productCollections).values(
+                targetColIds.map((colId) => ({ productId: id, collectionId: colId }))
+              );
+            }
+          })()
+        );
       }
 
-      // 6. Replace Pricing Matrix if supplied
+      // Replace Pricing Matrix
       if (data.pricingMatrix !== undefined) {
-        await tx.delete(pricingMatrix).where(eq(pricingMatrix.productId, id));
-        if (data.pricingMatrix.length > 0) {
-          await tx.insert(pricingMatrix).values(
-            data.pricingMatrix.map((pm) => ({
-              productId: id,
-              sizeLabel: pm.sizeLabel,
-              length: pm.length != null ? pm.length.toString() : null,
-              width: pm.width != null ? pm.width.toString() : null,
-              height: pm.height != null ? pm.height.toString() : null,
-              weightKg: pm.weightKg.toString(),
-              quantity: Number(pm.quantity),
-              pricePerPiece: pm.pricePerPiece.toString(),
-            }))
-          );
-        }
+        tasks.push(
+          (async () => {
+            await tx.delete(pricingMatrix).where(eq(pricingMatrix.productId, id));
+            if (data.pricingMatrix!.length > 0) {
+              await tx.insert(pricingMatrix).values(
+                data.pricingMatrix!.map((pm) => ({
+                  productId: id,
+                  sizeLabel: pm.sizeLabel,
+                  length: pm.length != null ? pm.length.toString() : null,
+                  width: pm.width != null ? pm.width.toString() : null,
+                  height: pm.height != null ? pm.height.toString() : null,
+                  weightKg: pm.weightKg.toString(),
+                  quantity: Number(pm.quantity),
+                  pricePerPiece: pm.pricePerPiece.toString(),
+                }))
+              );
+            }
+          })()
+        );
       }
 
-      // 7. Replace Images if supplied
+      // Execute all DB replacement tasks in parallel
+      await Promise.all(tasks);
+
+      // Phase 3: Replace Images if supplied & cleanup deleted files from Storage
       if (data.images !== undefined) {
+        const oldImages = await tx.select().from(productImages).where(eq(productImages.productId, id));
+        const newUrls = new Set(data.images.map((i) => i.imageUrl));
+
+        for (const oldImg of oldImages) {
+          if (oldImg.imageUrl && !newUrls.has(oldImg.imageUrl) && oldImg.imageUrl.includes('/products/')) {
+            try {
+              const filename = oldImg.imageUrl.split('/products/').pop()?.split('?')[0];
+              const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+              const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+              if (filename && supabaseUrl && serviceRoleKey) {
+                const { createClient } = await import('@supabase/supabase-js');
+                const supabase = createClient(supabaseUrl, serviceRoleKey);
+                await supabase.storage.from('products').remove([filename]);
+                console.log('✓ Automatically deleted removed product image from Supabase Storage:', filename);
+              }
+            } catch (err) {
+              console.error('Failed to cleanup old product image file:', err);
+            }
+          }
+        }
+
         await tx.delete(productImages).where(eq(productImages.productId, id));
         if (data.images.length > 0) {
           await tx.insert(productImages).values(

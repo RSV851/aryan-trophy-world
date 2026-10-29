@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { SmartImage } from '@/components/ui/smart-image';
 import { Textarea } from '@/components/ui/textarea';
 import { Skeleton } from '@/components/ui/skeleton';
 import { toast } from 'sonner';
@@ -260,13 +261,13 @@ export default function AdminInquiryDetailPage() {
                   return (
                     <div key={item.inquiryProductId || idx} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div className="flex items-center space-x-4">
-                        <div className="w-16 h-16 rounded-xl bg-gray-900 border border-gray-800 overflow-hidden shrink-0 flex items-center justify-center">
-                          {p?.primaryImage ? (
-                            <img src={p.primaryImage} alt="Award Thumbnail" className="w-full h-full object-cover" />
-                          ) : (
-                            <Package className="w-6 h-6 text-gray-600" />
-                          )}
-                        </div>
+                        <SmartImage
+                          src={p?.primaryImage}
+                          alt="Award Thumbnail"
+                          className="w-16 h-16 rounded-xl bg-gray-900 border border-gray-800"
+                          imgClassName="w-full h-full object-cover"
+                          fallbackIcon={<Package className="w-6 h-6 text-gray-600" />}
+                        />
                         <div>
                           <p className="text-sm font-bold text-white uppercase font-serif hover:text-[#C5A55A]">
                             {p?.name || `Showroom Trophy #${item.productId.substring(0, 8)}`}

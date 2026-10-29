@@ -101,8 +101,17 @@ export async function middleware(request: NextRequest) {
     }
   }
 
-  // ── 3. Refresh session (always — needed for Auth token rotation) ──────────
-  const { supabaseResponse, user } = await updateSession(request);
+  // ── 3. Refresh session ONLY for admin or auth routes (Bypass for public pages for 0ms speed) ──
+  const requiresAuthCheck = isAdminRoute(pathname) || isAdminApiRoute(pathname) || isLoginApiRoute(pathname);
+  
+  let response = NextResponse.next({ request });
+  let user = null;
+
+  if (requiresAuthCheck) {
+    const { supabaseResponse, user: sessionUser } = await updateSession(request);
+    response = supabaseResponse;
+    user = sessionUser;
+  }
 
   // ── 4. Protect /admin/* (except /admin/login) ─────────────────────────────
   if (isAdminRoute(pathname) && !isAdminLoginPage(pathname)) {
@@ -139,8 +148,8 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── 7. Apply security headers to all responses ────────────────────────────
-  applySecurityHeaders(supabaseResponse);
-  return supabaseResponse;
+  applySecurityHeaders(response);
+  return response;
 }
 
 // ─── Matcher: Skip static files & Next.js internals ──────────────────────────

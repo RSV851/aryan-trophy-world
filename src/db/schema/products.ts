@@ -15,6 +15,7 @@ export const products = pgTable("products", {
   typeId: uuid("type_id").notNull().references(() => productTypes.id, { onDelete: "restrict" }),
   sizeUnit: varchar("size_unit", { length: 10 }).default("cm").notNull(),
   isFeatured: boolean("is_featured").default(false).notNull(),
+  isBestseller: boolean("is_bestseller").default(false).notNull(),
   isActive: boolean("is_active").default(true).notNull(),
   seoTitle: varchar("seo_title", { length: 255 }),
   seoDescription: text("seo_description"),

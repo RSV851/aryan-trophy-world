@@ -38,6 +38,7 @@ export const createProductSchema = z.object({
   typeId: z.string().uuid("Invalid product type ID"),
   sizeUnit: sizeUnitEnum.default("cm"),
   isFeatured: z.boolean().default(false),
+  isBestseller: z.boolean().default(false),
   isActive: z.boolean().default(true),
   seoTitle: z.string().max(255).trim().optional().nullable(),
   seoDescription: z.string().trim().optional().nullable(),
@@ -63,6 +64,7 @@ export const productQuerySchema = paginationQuerySchema.extend({
   shapeSlug: z.string().trim().optional(),
   collectionSlug: z.string().trim().optional(),
   isFeatured: z.coerce.boolean().optional(),
+  isBestseller: z.coerce.boolean().optional(),
   minPrice: z.coerce.number().optional(),
   maxPrice: z.coerce.number().optional(),
 });

@@ -4,6 +4,7 @@ import { materials, productMaterials } from "@/db/schema";
 import { updateMaterialSchema } from "@/lib/validations";
 import { generateSlug } from "@/lib/utils/slug";
 import { successResponse, errorResponse } from "@/lib/utils/api-response";
+import { executeWithVaultAuth } from "@/lib/db/vault-session";
 import { eq, count } from "drizzle-orm";
 
 interface Params {
@@ -81,7 +82,9 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       );
     }
 
-    await db.delete(materials).where(eq(materials.id, id));
+    await executeWithVaultAuth(async () => {
+      await db.delete(materials).where(eq(materials.id, id));
+    });
     return successResponse(null, "Material deleted successfully");
   } catch (error: any) {
     return errorResponse("Failed to delete material", 500, error.message);

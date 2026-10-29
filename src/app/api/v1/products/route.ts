@@ -221,6 +221,7 @@ export async function POST(request: NextRequest) {
           typeId: data.typeId,
           sizeUnit: data.sizeUnit,
           isFeatured: data.isFeatured,
+          isBestseller: data.isBestseller,
           isActive: data.isActive,
           seoTitle: data.seoTitle,
           seoDescription: data.seoDescription,
@@ -232,63 +233,105 @@ export async function POST(request: NextRequest) {
 
       const productId = newProduct.id;
 
-      // 2. Insert Materials
+      // 2. Parallel Batching for all independent junction & child insertions
+      const tasks: Promise<any>[] = [];
+
+      // Insert Materials
       if (data.materialIds && data.materialIds.length > 0) {
-        await tx.insert(productMaterials).values(
-          data.materialIds.map((matId) => ({ productId, materialId: matId }))
+        tasks.push(
+          tx.insert(productMaterials).values(
+            data.materialIds.map((matId) => ({ productId, materialId: matId }))
+          )
         );
       }
 
-      // 3. Insert Themes
+      // Insert Themes
       if (data.themeIds && data.themeIds.length > 0) {
-        await tx.insert(productThemes).values(
-          data.themeIds.map((thmId) => ({ productId, themeId: thmId }))
+        tasks.push(
+          tx.insert(productThemes).values(
+            data.themeIds.map((thmId) => ({ productId, themeId: thmId }))
+          )
         );
       }
 
-      // 4. Insert Shapes
+      // Insert Shapes
       if (data.shapeIds && data.shapeIds.length > 0) {
-        await tx.insert(productShapes).values(
-          data.shapeIds.map((shpId) => ({ productId, shapeId: shpId }))
+        tasks.push(
+          tx.insert(productShapes).values(
+            data.shapeIds.map((shpId) => ({ productId, shapeId: shpId }))
+          )
         );
       }
 
-      // 5. Insert Collections
-      if (data.collectionIds && data.collectionIds.length > 0) {
-        await tx.insert(productCollections).values(
-          data.collectionIds.map((colId) => ({ productId, collectionId: colId }))
-        );
-      }
+      // Insert Collections with Auto-Sync for Featured & Best Sellers
+      tasks.push(
+        (async () => {
+          let targetColIds = [...(data.collectionIds || [])];
+          const [featCol, bestCol] = await Promise.all([
+            tx.select().from(collections).where(eq(collections.slug, 'featured')).limit(1).then((res) => res[0]),
+            tx.select().from(collections).where(eq(collections.slug, 'best-sellers')).limit(1).then((res) => res[0]),
+          ]);
 
-      // 6. Insert Pricing Matrix
+          if (featCol) {
+            if (data.isFeatured && !targetColIds.includes(featCol.id)) {
+              targetColIds.push(featCol.id);
+            } else if (!data.isFeatured) {
+              targetColIds = targetColIds.filter((cid) => cid !== featCol.id);
+            }
+          }
+
+          if (bestCol) {
+            if (data.isBestseller && !targetColIds.includes(bestCol.id)) {
+              targetColIds.push(bestCol.id);
+            } else if (!data.isBestseller) {
+              targetColIds = targetColIds.filter((cid) => cid !== bestCol.id);
+            }
+          }
+
+          if (targetColIds.length > 0) {
+            await tx.insert(productCollections).values(
+              targetColIds.map((colId) => ({ productId, collectionId: colId }))
+            );
+          }
+        })()
+      );
+
+      // Insert Pricing Matrix
       if (data.pricingMatrix && data.pricingMatrix.length > 0) {
-        await tx.insert(pricingMatrix).values(
-          data.pricingMatrix.map((pm) => ({
-            productId,
-            sizeLabel: pm.sizeLabel,
-            length: pm.length != null ? pm.length.toString() : null,
-            width: pm.width != null ? pm.width.toString() : null,
-            height: pm.height != null ? pm.height.toString() : null,
-            weightKg: pm.weightKg.toString(),
-            quantity: Number(pm.quantity),
-            pricePerPiece: pm.pricePerPiece.toString(),
-          }))
+        tasks.push(
+          tx.insert(pricingMatrix).values(
+            data.pricingMatrix.map((pm) => ({
+              productId,
+              sizeLabel: pm.sizeLabel,
+              length: pm.length != null ? pm.length.toString() : null,
+              width: pm.width != null ? pm.width.toString() : null,
+              height: pm.height != null ? pm.height.toString() : null,
+              weightKg: pm.weightKg.toString(),
+              quantity: Number(pm.quantity),
+              pricePerPiece: pm.pricePerPiece.toString(),
+            }))
+          )
         );
       }
 
-      // 7. Insert Images
+      // Insert Images
       if (data.images && data.images.length > 0) {
-        await tx.insert(productImages).values(
-          data.images.map((img, index) => ({
-            productId,
-            imageUrl: img.imageUrl,
-            thumbnailUrl: img.thumbnailUrl || null,
-            altText: img.altText || data.name,
-            displayOrder: img.displayOrder !== undefined ? img.displayOrder : index,
-            isPrimary: img.isPrimary !== undefined ? img.isPrimary : index === 0,
-          }))
+        tasks.push(
+          tx.insert(productImages).values(
+            data.images.map((img, index) => ({
+              productId,
+              imageUrl: img.imageUrl,
+              thumbnailUrl: img.thumbnailUrl || null,
+              altText: img.altText || data.name,
+              displayOrder: img.displayOrder !== undefined ? img.displayOrder : index,
+              isPrimary: img.isPrimary !== undefined ? img.isPrimary : index === 0,
+            }))
+          )
         );
       }
+
+      // Execute all junction insertions in a single parallel batch
+      await Promise.all(tasks);
 
       return newProduct;
     });

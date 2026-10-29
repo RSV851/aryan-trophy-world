@@ -54,6 +54,23 @@ export async function PUT(request: NextRequest) {
       return successResponse(newProfile, "Admin profile created successfully", 201);
     }
 
+    // Auto-delete old avatar file from Supabase Storage if replaced
+    if (existing.avatarUrl && data.avatarUrl && existing.avatarUrl !== data.avatarUrl && existing.avatarUrl.includes('/branding/')) {
+      try {
+        const filename = existing.avatarUrl.split('/branding/').pop()?.split('?')[0];
+        const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+        const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+        if (filename && supabaseUrl && serviceRoleKey) {
+          const { createClient } = await import('@supabase/supabase-js');
+          const supabase = createClient(supabaseUrl, serviceRoleKey);
+          await supabase.storage.from('branding').remove([filename]);
+          console.log('✓ Automatically deleted replaced old avatar from Supabase Storage:', filename);
+        }
+      } catch (err) {
+        console.error('Failed to cleanup old avatar file:', err);
+      }
+    }
+
     // Update existing profile
     const [updatedProfile] = await db
       .update(adminProfile)

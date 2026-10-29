@@ -20,13 +20,14 @@ export default async function CatalogPage({
 
   const query: PublicProductsQuery = {
     page: params.page ? parseInt(params.page, 10) : 1,
-    limit: 12,
+    limit: 50,
     search: params.search,
-    categorySlug: params.categorySlug,
-    typeSlug: params.typeSlug,
-    materialSlug: params.materialSlug,
-    themeSlug: params.themeSlug,
-    collectionSlug: params.collectionSlug,
+    categorySlug: params.categorySlug || params.category,
+    subcategorySlug: params.subcategorySlug || params.subcategory,
+    typeSlug: params.typeSlug || params.type,
+    materialSlug: params.materialSlug || params.material,
+    themeSlug: params.themeSlug || params.theme,
+    collectionSlug: params.collectionSlug || params.collection,
     sortBy: (params.sortBy as any) || 'createdAt',
     sortOrder: (params.sortOrder as any) || 'desc',
   };

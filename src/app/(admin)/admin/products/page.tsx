@@ -7,6 +7,7 @@ import { DataTable } from '@/components/shared/data-table';
 import { ConfirmDialog } from '@/components/shared/confirm-dialog';
 import { ColumnDef } from '@tanstack/react-table';
 import { Button } from '@/components/ui/button';
+import { SmartImage } from '@/components/ui/smart-image';
 import { Trophy, Plus, Edit2, Trash2, Eye, Star, CheckCircle, XCircle, Tag, Layers } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -35,7 +36,12 @@ export default function AdminProductsPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [totalItems, setTotalItems] = useState(0);
 
-  // Delete State
+  // Multi-Select Bulk Actions State
+  const [selectedProductIds, setSelectedProductIds] = useState<string[]>([]);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+  const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+
+  // Single Delete State
   const [deleteId, setDeleteId] = useState<string | null>(null);
   const [deleteName, setDeleteName] = useState('');
   const [isDeleting, setIsDeleting] = useState(false);
@@ -56,8 +62,10 @@ export default function AdminProductsPage() {
         const json = await res.json();
         const items = json.data?.items || json.data || [];
         setProducts(Array.isArray(items) ? items : []);
-        setTotalPages(json.data?.pagination?.totalPages || 1);
-        setTotalItems(json.data?.pagination?.totalItems || (Array.isArray(items) ? items.length : 0));
+        const paginationObj = json.pagination || json.data?.pagination || {};
+        setTotalPages(paginationObj.totalPages || 1);
+        setTotalItems(paginationObj.total || paginationObj.totalItems || (Array.isArray(items) ? items.length : 0));
+        setSelectedProductIds([]); // Reset selection on page reload
       } else {
         toast.error('Failed to query catalog trophies from server.');
       }
@@ -94,20 +102,76 @@ export default function AdminProductsPage() {
     }
   };
 
+  const handleBulkDeleteProducts = async () => {
+    if (selectedProductIds.length === 0) return;
+    setIsBulkDeleting(true);
+    try {
+      const results = await Promise.allSettled(
+        selectedProductIds.map(async (id) => {
+          const res = await fetch(`/api/v1/products/${id}`, { method: 'DELETE' });
+          if (!res.ok) throw new Error('Failed');
+          return id;
+        })
+      );
+
+      const successCount = results.filter((r) => r.status === 'fulfilled').length;
+      toast.success(`Successfully archived ${successCount} selected trophy item(s).`);
+      setSelectedProductIds([]);
+      setShowBulkDeleteModal(false);
+      fetchProducts();
+    } catch {
+      toast.error('Failed to process batch product archiving.');
+    } finally {
+      setIsBulkDeleting(false);
+    }
+  };
+
   const columns = useMemo<ColumnDef<CatalogProduct>[]>(
     () => [
+      {
+        id: 'select',
+        header: () => (
+          <input
+            type="checkbox"
+            checked={products.length > 0 && products.every((p) => selectedProductIds.includes(p.id))}
+            onChange={(e) => {
+              if (e.target.checked) {
+                setSelectedProductIds(products.map((p) => p.id));
+              } else {
+                setSelectedProductIds([]);
+              }
+            }}
+            className="w-4 h-4 rounded border-gray-700 bg-gray-900 text-[#C5A55A] focus:ring-[#C5A55A] cursor-pointer"
+            title="Select / Deselect All Products"
+          />
+        ),
+        cell: ({ row }) => (
+          <input
+            type="checkbox"
+            checked={selectedProductIds.includes(row.original.id)}
+            onChange={(e) => {
+              if (e.target.checked) {
+                setSelectedProductIds((prev) => [...prev, row.original.id]);
+              } else {
+                setSelectedProductIds((prev) => prev.filter((id) => id !== row.original.id));
+              }
+            }}
+            className="w-4 h-4 rounded border-gray-700 bg-gray-900 text-[#C5A55A] focus:ring-[#C5A55A] cursor-pointer"
+          />
+        ),
+      },
       {
         accessorKey: 'name',
         header: 'Trophy Showroom Title & SKU',
         cell: ({ row }) => (
           <div className="flex items-center space-x-3.5">
-            <div className="w-12 h-12 rounded-xl bg-gray-900 border border-gray-800 overflow-hidden shrink-0 flex items-center justify-center shadow">
-              {row.original.primaryImage?.imageUrl ? (
-                <img src={row.original.primaryImage.imageUrl} alt="Thumbnail" className="w-full h-full object-cover" />
-              ) : (
-                <Trophy className="w-5 h-5 text-[#C5A55A]/50" />
-              )}
-            </div>
+            <SmartImage
+              src={row.original.primaryImage?.imageUrl}
+              alt={row.original.name}
+              className="w-12 h-12 rounded-xl bg-gray-900 border border-gray-800"
+              imgClassName="w-full h-full object-cover"
+              fallbackIcon={<Trophy className="w-5 h-5 text-[#C5A55A]/50 stroke-[1.5]" />}
+            />
             <div>
               <div className="flex items-center space-x-2">
                 <span className="font-extrabold text-white text-sm hover:text-[#C5A55A] transition-colors">
@@ -209,7 +273,7 @@ export default function AdminProductsPage() {
         ),
       },
     ],
-    []
+    [products, selectedProductIds]
   );
 
   return (
@@ -225,12 +289,26 @@ export default function AdminProductsPage() {
             Manage your physical trophy portfolio, multi-tiered volume pricing matrices, and customization amenities.
           </p>
         </div>
-        <Link href="/admin/products/create">
-          <Button className="bg-[#C5A55A] hover:bg-[#d5b568] text-[#090909] font-extrabold uppercase tracking-wider text-xs h-11 px-6 rounded-lg shadow-[0_0_20px_rgba(197,165,90,0.3)] flex items-center space-x-2 shrink-0">
-            <Plus className="w-4 h-4 stroke-[3]" />
-            <span>+ Launch New Trophy</span>
-          </Button>
-        </Link>
+
+        <div className="flex items-center space-x-3 shrink-0 flex-wrap gap-2">
+          {/* Multi-Select Bulk Delete Button */}
+          {selectedProductIds.length > 0 && (
+            <Button
+              onClick={() => setShowBulkDeleteModal(true)}
+              className="bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs h-11 px-5 rounded-lg flex items-center space-x-2 shadow-md animate-in fade-in"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Archive Selected ({selectedProductIds.length})</span>
+            </Button>
+          )}
+
+          <Link href="/admin/products/create">
+            <Button className="bg-[#C5A55A] hover:bg-[#d5b568] text-[#090909] font-extrabold uppercase tracking-wider text-xs h-11 px-6 rounded-lg shadow-[0_0_20px_rgba(197,165,90,0.3)] flex items-center space-x-2 shrink-0">
+              <Plus className="w-4 h-4 stroke-[3]" />
+              <span>Add Product</span>
+            </Button>
+          </Link>
+        </div>
       </div>
 
       {/* TanStack Data Table */}
@@ -252,10 +330,10 @@ export default function AdminProductsPage() {
           onPageChange: (p) => setPage(p),
         }}
         emptyTitle="No Trophy Records Located"
-        emptyDescription="Your catalog currently has no products matching this search criteria. Click 'Launch New Trophy' to create an award item."
+        emptyDescription="Your catalog currently has no products matching this search criteria. Click 'Add Product' to create an award item."
       />
 
-      {/* Soft Delete Warning Modal */}
+      {/* Single Soft Delete Warning Modal */}
       <ConfirmDialog
         isOpen={!!deleteId}
         onClose={() => setDeleteId(null)}
@@ -265,6 +343,18 @@ export default function AdminProductsPage() {
         confirmText="Confirm Soft Deletion"
         isLoading={isDeleting}
         variant="danger"
+      />
+
+      {/* Multi-Select Bulk Archive Confirmation Warning */}
+      <ConfirmDialog
+        isOpen={showBulkDeleteModal}
+        onClose={() => setShowBulkDeleteModal(false)}
+        onConfirm={handleBulkDeleteProducts}
+        title={`Archive ${selectedProductIds.length} Selected Trophies?`}
+        description={`Are you sure you want to batch-archive ${selectedProductIds.length} selected catalog products? They will be hidden from the showroom while preserving customer quote inquiry history.`}
+        confirmText={`Archive ${selectedProductIds.length} Trophies`}
+        variant="danger"
+        isLoading={isBulkDeleting}
       />
     </div>
   );

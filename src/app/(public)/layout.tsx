@@ -3,7 +3,7 @@ import { Navbar } from '@/components/public/navbar';
 import { Footer } from '@/components/public/footer';
 import { getPublicSettingsMap, getPublicOwnerProfile, getPublicCategories } from '@/lib/data/public-catalog';
 
-export const revalidate = 60; // Refresh public layout settings cache every 60 seconds
+export const revalidate = 60; // Standard Next.js server cache
 
 export default async function PublicLayout({
   children,
@@ -17,7 +17,7 @@ export default async function PublicLayout({
   ]);
 
   return (
-    <div className="min-h-screen flex flex-col bg-white text-[#111827] font-sans selection:bg-[#C5A55A] selection:text-black">
+    <div className="public-site min-h-screen flex flex-col bg-background text-foreground transition-colors duration-300 font-sans selection:bg-[#FF5B00] dark:selection:bg-[#f2ca50] selection:text-white">
       <Navbar settings={settings} profile={profile} />
       <main className="flex-1 w-full flex flex-col">
         {children}

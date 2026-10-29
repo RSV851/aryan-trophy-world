@@ -76,16 +76,16 @@ export function DataTable<TData, TValue>({
   return (
     <div className="space-y-4">
       {/* Controls Header */}
-      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 bg-[#111827]/60 border border-gray-800/80 rounded-xl p-4 backdrop-blur-xs shadow-inner">
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 flex-1">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 mobile-mid:gap-4 bg-[#111827]/60 border border-gray-800/80 rounded-xl p-2.5 mobile-mid:p-3.5 sm:p-4 backdrop-blur-xs shadow-inner">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 mobile-mid:gap-3 flex-1">
           {onSearchChange && (
             <div className="relative w-full sm:max-w-xs">
-              <Search className="absolute left-3 top-3 w-4 h-4 text-gray-400" />
+              <Search className="absolute left-3 top-2.5 mobile-mid:top-3 w-3.5 h-3.5 mobile-mid:w-4 mobile-mid:h-4 text-gray-400" />
               <Input
                 placeholder={searchPlaceholder}
                 value={localSearch}
                 onChange={(e) => setLocalSearch(e.target.value)}
-                className="pl-9 bg-[#090909] border-gray-700 text-white placeholder:text-gray-500 text-xs h-10 focus:border-[#C5A55A] focus:ring-[#C5A55A]/50"
+                className="pl-8 mobile-mid:pl-9 bg-[#090909] border-gray-700 text-white placeholder:text-gray-500 text-[11px] mobile-mid:text-xs h-9 mobile-mid:h-10 focus:border-[#C5A55A] focus:ring-[#C5A55A]/50"
               />
             </div>
           )}
@@ -106,7 +106,7 @@ export function DataTable<TData, TValue>({
                     return (
                       <TableHead
                         key={header.id}
-                        className="py-3.5 px-4 text-xs font-bold uppercase tracking-wider text-gray-300 font-serif whitespace-nowrap select-none"
+                        className="py-2.5 mobile-mid:py-3.5 px-2.5 mobile-mid:px-4 text-[10px] mobile-mid:text-xs font-bold uppercase tracking-wider text-gray-300 font-serif whitespace-nowrap select-none"
                         onClick={canSort ? header.column.getToggleSortingHandler() : undefined}
                         style={{ cursor: canSort ? 'pointer' : 'default' }}
                       >
@@ -116,7 +116,7 @@ export function DataTable<TData, TValue>({
                               ? null
                               : flexRender(header.column.columnDef.header, header.getContext())}
                           </span>
-                          {canSort && <ArrowUpDown className="w-3.5 h-3.5 text-[#C5A55A]/70 shrink-0" />}
+                          {canSort && <ArrowUpDown className="w-3 h-3 mobile-mid:w-3.5 mobile-mid:h-3.5 text-[#C5A55A]/70 shrink-0" />}
                         </div>
                       </TableHead>
                     );
@@ -129,8 +129,8 @@ export function DataTable<TData, TValue>({
                 Array.from({ length: 5 }).map((_, i) => (
                   <TableRow key={i} className="hover:bg-transparent border-gray-800/60">
                     {columns.map((_, idx) => (
-                      <TableCell key={idx} className="py-4 px-4">
-                        <Skeleton className="h-5 w-full max-w-[140px] bg-gray-800/80 rounded-md" />
+                      <TableCell key={idx} className="py-3 mobile-mid:py-4 px-2.5 mobile-mid:px-4">
+                        <Skeleton className="h-4 mobile-mid:h-5 w-full max-w-[140px] bg-gray-800/80 rounded-md" />
                       </TableCell>
                     ))}
                   </TableRow>
@@ -143,7 +143,7 @@ export function DataTable<TData, TValue>({
                     className="hover:bg-[#1f2937]/50 transition-colors border-gray-800/60 group"
                   >
                     {row.getVisibleCells().map((cell) => (
-                      <TableCell key={cell.id} className="py-3.5 px-4 text-sm text-gray-200">
+                      <TableCell key={cell.id} className="py-2.5 mobile-mid:py-3.5 px-2.5 mobile-mid:px-4 text-xs mobile-mid:text-sm text-gray-200">
                         {flexRender(cell.column.columnDef.cell, cell.getContext())}
                       </TableCell>
                     ))}
@@ -172,8 +172,8 @@ export function DataTable<TData, TValue>({
 
         {/* Pagination Controls */}
         {pagination && pagination.totalPages > 1 && (
-          <div className="bg-[#090909]/90 border-t border-gray-800 px-6 py-4 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-gray-400">
-            <div>
+          <div className="bg-[#090909]/90 border-t border-gray-800 px-3 mobile-mid:px-4 sm:px-6 py-3 sm:py-4 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-400">
+            <div className="text-[11px] mobile-mid:text-xs text-center sm:text-left">
               Showing page <strong className="text-[#C5A55A] font-semibold">{pagination.page}</strong> of{' '}
               <strong className="text-white font-semibold">{pagination.totalPages}</strong> (
               <span className="text-gray-300 font-medium">{pagination.totalItems} total records</span>)
@@ -185,7 +185,7 @@ export function DataTable<TData, TValue>({
                 size="sm"
                 onClick={() => pagination.onPageChange(pagination.page - 1)}
                 disabled={pagination.page <= 1 || isLoading}
-                className="border-gray-700 bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs h-9 px-3.5 flex items-center space-x-1 uppercase font-semibold tracking-wider"
+                className="border-gray-700 bg-gray-800 hover:bg-gray-700 text-gray-200 text-[10px] mobile-mid:text-xs h-8 mobile-mid:h-9 px-2.5 mobile-mid:px-3.5 flex items-center space-x-1 uppercase font-semibold tracking-wider"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
                 <span>Prev</span>
@@ -195,7 +195,7 @@ export function DataTable<TData, TValue>({
                 size="sm"
                 onClick={() => pagination.onPageChange(pagination.page + 1)}
                 disabled={pagination.page >= pagination.totalPages || isLoading}
-                className="border-gray-700 bg-gray-800 hover:bg-gray-700 text-gray-200 text-xs h-9 px-3.5 flex items-center space-x-1 uppercase font-semibold tracking-wider"
+                className="border-gray-700 bg-gray-800 hover:bg-gray-700 text-gray-200 text-[10px] mobile-mid:text-xs h-8 mobile-mid:h-9 px-2.5 mobile-mid:px-3.5 flex items-center space-x-1 uppercase font-semibold tracking-wider"
               >
                 <span>Next</span>
                 <ChevronRight className="w-3.5 h-3.5" />

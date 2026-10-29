@@ -1,369 +1,570 @@
 'use client';
 
-import React, { useState } from 'react';
-import Image from 'next/image';
+import React, { useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useInquiryStore } from '@/stores/inquiry-store';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import {
+  Trophy,
+  ArrowLeft,
+  ChevronRight,
+  Sparkles,
+  CheckCircle2,
+  PhoneCall,
+  Mail,
+  Ruler,
+  Barcode,
+  Folder,
+  Layers,
+  Award,
+  Gem,
+  Hexagon,
+  Star,
+  Weight,
+  ShieldCheck,
+  Package,
+} from 'lucide-react';
+import { SmartImage } from '@/components/ui/smart-image';
 import { ProductCard } from '@/components/public/product-card';
-import { Button } from '@/components/ui/button';
-import { Trophy, ShieldCheck, Sparkles, Check, Plus, Minus, ShoppingBag, ArrowLeft, Ruler, Weight, Tag, Layers, FileText } from 'lucide-react';
+import { useInquiryStore } from '@/stores/inquiry-store';
+import { toast } from 'sonner';
 
 interface ProductDetailClientProps {
   product: any;
-  relatedProducts: Array<any>;
+  matrixRows?: any[];
+  minStartingPrice?: string;
+  unit?: string;
+  baseL?: string | number;
+  baseB?: string | number;
+  baseH?: string | number;
+  categoryLabel?: string;
+  subcategoryLabel?: string;
+  typeLabel?: string;
+  materialLabel?: string;
+  shapeLabel?: string;
+  themeLabel?: string;
+  relatedProducts?: any[];
 }
 
-export function ProductDetailClient({ product, relatedProducts }: ProductDetailClientProps) {
+export function ProductDetailClient({
+  product,
+  matrixRows = product?.pricingMatrix || [],
+  minStartingPrice = product?.priceRange || '₹14,500',
+  unit = product?.sizeUnit || 'cm',
+  baseL = product?.pricingMatrix?.[0]?.dimL || 18,
+  baseB = product?.pricingMatrix?.[0]?.dimB || 12,
+  baseH = product?.pricingMatrix?.[0]?.dimH || 24,
+  categoryLabel = product?.categoryName || product?.category?.name || 'Sports Trophies',
+  subcategoryLabel = product?.subcategoryName || product?.subcategory?.name || 'Cricket Series',
+  typeLabel = product?.typeName || product?.type?.name || 'Trophy',
+  materialLabel = product?.materials?.join(', ') || product?.materialName || 'Optical Crystal',
+  shapeLabel = product?.shapeName || 'Obelisk',
+  themeLabel = product?.themeName || 'Championship',
+  relatedProducts = [],
+}: ProductDetailClientProps) {
+  const router = useRouter();
   const addItem = useInquiryStore((s) => s.addItem);
-  const isInInquiry = useInquiryStore((s) => s.isInInquiry(product.id));
-
-  // Images gallery state
-  const defaultImg = 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1000&auto=format&fit=crop&q=80';
-  const gallery = product.images && product.images.length > 0 ? product.images : [{ id: '1', imageUrl: defaultImg, caption: product.name }];
   const [activeImageIndex, setActiveImageIndex] = useState(0);
 
-  // Pricing matrix calculation & quantity selection state
-  const matrix = product.pricingMatrix || [];
-  const minQtyInMatrix = matrix.length > 0 ? Math.min(...matrix.map((m: any) => Number(m.quantity) || 1)) : 25;
-  const [quantity, setQuantity] = useState(minQtyInMatrix);
-  const [selectedSizeLabel, setSelectedSizeLabel] = useState<string>(matrix[0]?.sizeLabel || 'Standard Executive Tier');
+  const gallery =
+    product.images && product.images.length > 0
+      ? product.images
+      : product.imageUrl
+      ? [{ id: 'primary', imageUrl: product.imageUrl, caption: product.name }]
+      : [{ id: 'fallback', imageUrl: '/images/trophies/gold-cup.jpg', caption: product.name }];
 
-  // Determine active price bracket based on quantity
-  const getCurrentPrice = () => {
-    if (!matrix || matrix.length === 0) return null;
-    // Sort ascending by quantity threshold
-    const sorted = [...matrix].sort((a: any, b: any) => Number(a.quantity) - Number(b.quantity));
-    let price = Number(sorted[0].pricePerPiece);
-    for (const row of sorted) {
-      if (quantity >= Number(row.quantity)) {
-        price = Number(row.pricePerPiece);
-      }
+  const displayMatrixRows = useMemo(() => {
+    if (Array.isArray(matrixRows) && matrixRows.length > 0) {
+      return matrixRows.map((row: any) => {
+        const basePrice = Number(row.pricePerPiece || row.price || row.qty1 || 14500);
+        const safeBasePrice = isNaN(basePrice) ? 14500 : basePrice;
+
+        const sizeLabel = row.sizeLabel || (row.dimL && row.dimB && row.dimH ? `${row.dimL}×${row.dimB}×${row.dimH} ${unit}` : 'Standard Tier');
+        const dimString = row.dimString || (row.dimL && row.dimB && row.dimH ? `${row.dimL} × ${row.dimB} × ${row.dimH} ${unit}` : `${baseL} × ${baseB} × ${baseH} ${unit}`);
+        const weightStr = row.weight ? (typeof row.weight === 'number' ? `${row.weight} kg` : String(row.weight)) : '1.2 kg';
+
+        const q1 = row.qty1 !== undefined ? Number(row.qty1) : safeBasePrice;
+        const q5 = row.qty5 !== undefined ? Number(row.qty5) : Math.round(safeBasePrice * 0.95);
+        const q10 = row.qty10 !== undefined ? Number(row.qty10) : Math.round(safeBasePrice * 0.90);
+        const q25 = row.qty25 !== undefined ? Number(row.qty25) : Math.round(safeBasePrice * 0.85);
+        const q50 = row.qty50 !== undefined ? Number(row.qty50) : Math.round(safeBasePrice * 0.80);
+        const q100 = row.qty100 !== undefined ? Number(row.qty100) : Math.round(safeBasePrice * 0.75);
+
+        const fmt = (n: number) => isNaN(n) ? '—' : `₹${n.toLocaleString('en-IN')}`;
+
+        return {
+          sizeLabel,
+          dimString,
+          weight: weightStr,
+          qty1Fmt: fmt(q1),
+          qty5Fmt: fmt(q5),
+          qty10Fmt: fmt(q10),
+          qty25Fmt: fmt(q25),
+          qty50Fmt: fmt(q50),
+          qty100Fmt: fmt(q100),
+        };
+      });
     }
-    return price;
-  };
 
-  const currentPrice = getCurrentPrice();
+    const baseP = Number(minStartingPrice?.replace(/[^0-9]/g, '')) || 14500;
+    const fmt = (n: number) => `₹${n.toLocaleString('en-IN')}`;
 
-  const handleAddToInquiry = () => {
+    return [
+      {
+        sizeLabel: '7" Tier',
+        dimString: `14 × 10 × 18 ${unit}`,
+        weight: '0.9 kg',
+        qty1Fmt: fmt(baseP),
+        qty5Fmt: fmt(Math.round(baseP * 0.95)),
+        qty10Fmt: fmt(Math.round(baseP * 0.90)),
+        qty25Fmt: fmt(Math.round(baseP * 0.85)),
+        qty50Fmt: fmt(Math.round(baseP * 0.80)),
+        qty100Fmt: fmt(Math.round(baseP * 0.75)),
+      },
+      {
+        sizeLabel: '8" Tier',
+        dimString: `16 × 11 × 20 ${unit}`,
+        weight: '1.2 kg',
+        qty1Fmt: fmt(Math.round(baseP * 1.15)),
+        qty5Fmt: fmt(Math.round(baseP * 1.15 * 0.95)),
+        qty10Fmt: fmt(Math.round(baseP * 1.15 * 0.90)),
+        qty25Fmt: fmt(Math.round(baseP * 1.15 * 0.85)),
+        qty50Fmt: fmt(Math.round(baseP * 1.15 * 0.80)),
+        qty100Fmt: fmt(Math.round(baseP * 1.15 * 0.75)),
+      },
+      {
+        sizeLabel: '9" Tier',
+        dimString: `18 × 12 × 23 ${unit}`,
+        weight: '1.5 kg',
+        qty1Fmt: fmt(Math.round(baseP * 1.3)),
+        qty5Fmt: fmt(Math.round(baseP * 1.3 * 0.95)),
+        qty10Fmt: fmt(Math.round(baseP * 1.3 * 0.90)),
+        qty25Fmt: fmt(Math.round(baseP * 1.3 * 0.85)),
+        qty50Fmt: fmt(Math.round(baseP * 1.3 * 0.80)),
+        qty100Fmt: fmt(Math.round(baseP * 1.3 * 0.75)),
+      },
+    ];
+  }, [matrixRows, minStartingPrice, unit, baseL, baseB, baseH]);
+
+  const handleSendInquiry = () => {
     addItem({
       productId: product.id,
       slug: product.slug,
       name: product.name,
       sku: product.sku,
-      imageUrl: gallery[activeImageIndex]?.imageUrl || defaultImg,
-      priceRange: currentPrice ? `₹${currentPrice.toLocaleString()} / pc` : product.priceRange,
-      categoryName: product.category?.name || 'Award',
-      quantity,
-      sizeUnit: product.sizeUnit,
-      selectedSizeLabel,
+      imageUrl: product.imageUrl,
+      priceRange: minStartingPrice,
+      categoryName: categoryLabel,
+      quantity: 25,
     });
+
+    toast.success(`Added ${product.name} (SKU: ${product.sku}) to your wholesale inquiry form.`);
+    router.push('/contact');
   };
 
-  const customizationOptions = Array.isArray(product.customizationOptions) && product.customizationOptions.length > 0
-    ? product.customizationOptions
-    : ['High-Precision Laser Engraving', 'UV Metallic Logo Embedding', 'Customized Teakwood & Marble Base Plate', 'Individual Velvet Corporate Presentation Box'];
+  const handleCallWorkshop = () => {
+    window.location.href = 'tel:+919876543210';
+  };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full space-y-16">
+    <main className="w-full max-w-[1500px] mx-auto px-4 sm:px-6 md:px-10 lg:px-12 py-10 sm:py-16 text-foreground selection:bg-primary selection:text-white transition-colors duration-300">
       
-      {/* Navigation Breadcrumbs & Back Link */}
-      <div className="flex items-center justify-between border-b border-gray-200 pb-4">
-        <Link href="/catalog" className="inline-flex items-center space-x-2 text-xs font-bold uppercase tracking-wider text-gray-500 hover:text-[#C5A55A] transition-colors">
-          <ArrowLeft className="w-4 h-4 stroke-[2.5]" />
-          <span>Return to Catalog Showroom</span>
+      {/* Breadcrumbs */}
+      <div className="flex flex-wrap items-center gap-2 font-sans text-xs sm:text-sm text-muted-foreground mb-8 sm:mb-12 font-semibold tracking-wider uppercase">
+        <Link href="/catalog" className="hover:text-primary transition-colors flex items-center gap-1">
+          <ArrowLeft className="w-3.5 h-3.5 mr-1 text-primary" />
+          <span>Catalog</span>
         </Link>
-        <span className="text-xs font-mono text-gray-400 font-semibold">SKU: {product.sku}</span>
+        <ChevronRight className="w-4 h-4 text-primary/70" />
+        <Link href={`/catalog?categorySlug=${product.category?.slug || 'all'}`} className="hover:text-primary transition-colors">
+          {categoryLabel}
+        </Link>
+        <ChevronRight className="w-4 h-4 text-primary/70" />
+        <span className="text-primary font-extrabold">{product.name}</span>
       </div>
 
-      {/* 1. PRODUCT STUDIO WORKSPACE (Gallery + Details) */}
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+      {/* PRODUCT HERO SECTION */}
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 mb-20 items-start">
         
-        {/* Left Column: Image Gallery with Interactive Thumbnails */}
-        <div className="lg:col-span-6 space-y-4">
-          <div className="relative aspect-[4/3] w-full rounded-3xl overflow-hidden border-2 border-[#C5A55A]/30 bg-gray-900 shadow-2xl group">
-            <Image
-              src={gallery[activeImageIndex]?.imageUrl || defaultImg}
+        {/* Gallery Column (7 Cols) */}
+        <div className="lg:col-span-7 flex flex-col gap-4">
+          <div className="w-full aspect-[4/5] bg-card border border-border rounded-2xl overflow-hidden relative group cursor-zoom-in shadow-md">
+            <SmartImage
+              src={gallery[activeImageIndex]?.imageUrl}
               alt={gallery[activeImageIndex]?.caption || product.name}
-              fill
-              priority
-              className="object-cover object-center group-hover:scale-105 transition-transform duration-500 ease-out"
+              className="w-full h-full"
+              imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              fallbackIcon={<Trophy className="w-24 h-24 text-primary/50 stroke-[1.5]" />}
             />
+            <div className="absolute top-4 right-4 bg-card/90 backdrop-blur-md text-primary border border-primary/40 font-mono text-xs font-bold uppercase tracking-widest px-3.5 py-1 rounded-full shadow-lg">
+              {typeLabel}
+            </div>
             {product.isFeatured && (
-              <div className="absolute top-4 left-4 bg-[#1A1F36] text-[#C5A55A] text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full border border-[#C5A55A]/40 shadow-lg flex items-center space-x-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-[#C5A55A]" />
-                <span>Featured Atelier Piece</span>
+              <div className="absolute top-4 left-4 bg-card text-primary text-xs font-black uppercase tracking-wider px-3.5 py-1 rounded-full border border-primary/60 shadow-lg flex items-center gap-1.5">
+                <Sparkles className="w-3.5 h-3.5 text-primary" />
+                <span>Atelier Prestige</span>
               </div>
             )}
-            <div className="absolute bottom-4 right-4 bg-black/70 backdrop-blur-md text-white text-[11px] font-mono font-semibold px-3 py-1 rounded-md border border-white/20">
-              {activeImageIndex + 1} / {gallery.length} View
+            <div className="absolute bottom-4 left-4 bg-card/90 backdrop-blur-md text-foreground font-mono text-[11px] px-3.5 py-1.5 rounded-lg border border-border uppercase tracking-wider">
+              {gallery[activeImageIndex]?.caption || `Elevation ${activeImageIndex + 1}`}
             </div>
           </div>
 
-          {/* Thumbnail switcher bar */}
-          {gallery.length > 1 && (
-            <div className="flex items-center space-x-3 overflow-x-auto pb-2">
-              {gallery.map((img: any, idx: number) => (
+          {/* 4 Thumbnails Grid */}
+          <div className="grid grid-cols-4 gap-3 sm:gap-4">
+            {gallery.slice(0, 4).map((img: any, idx: number) => {
+              const isSelected = idx === activeImageIndex;
+              return (
                 <button
                   key={img.id || idx}
                   onClick={() => setActiveImageIndex(idx)}
-                  className={`relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 border-2 transition-all ${
-                    idx === activeImageIndex
-                      ? 'border-[#C5A55A] shadow-[0_0_12px_rgba(197,165,90,0.5)] scale-105'
-                      : 'border-gray-200 opacity-60 hover:opacity-100'
+                  className={`aspect-square rounded-xl overflow-hidden relative border-2 transition-all duration-300 bg-card ${
+                    isSelected
+                      ? 'border-primary shadow-md scale-[1.02]'
+                      : 'border-border opacity-60 hover:opacity-100'
                   }`}
                 >
-                  <Image src={img.imageUrl} alt="Thumbnail" fill className="object-cover" />
+                  <SmartImage
+                    src={img.imageUrl}
+                    alt={`Thumbnail ${idx + 1}`}
+                    className="w-full h-full"
+                    imgClassName="w-full h-full object-cover"
+                    fallbackIcon={<Trophy className="w-8 h-8 text-primary/40 stroke-[1.5]" />}
+                  />
                 </button>
-              ))}
-            </div>
-          )}
-
-          {/* Quick Specifications Callout Box */}
-          <div className="bg-[#1A1F36] text-white rounded-2xl p-6 border border-[#C5A55A]/30 shadow-md space-y-4">
-            <div className="flex items-center space-x-2 text-[#C5A55A] text-xs font-bold uppercase tracking-wider font-serif">
-              <ShieldCheck className="w-4 h-4" />
-              <span>Verified Atelier Specifications</span>
-            </div>
-            <div className="grid grid-cols-2 gap-4 text-xs">
-              <div>
-                <p className="text-gray-400 font-semibold uppercase text-[10px]">Measurement Unit</p>
-                <p className="font-mono font-black text-white text-sm mt-0.5">{product.sizeUnit || 'Inches / Centimeters'}</p>
-              </div>
-              <div>
-                <p className="text-gray-400 font-semibold uppercase text-[10px]">Minimum Order Threshold</p>
-                <p className="font-mono font-black text-[#C5A55A] text-sm mt-0.5">{minQtyInMatrix} Pieces</p>
-              </div>
-              <div>
-                <p className="text-gray-400 font-semibold uppercase text-[10px]">Category Classification</p>
-                <p className="font-bold text-white mt-0.5">{product.category?.name || 'Championship'}</p>
-              </div>
-              <div>
-                <p className="text-gray-400 font-semibold uppercase text-[10px]">Subcategory Tier</p>
-                <p className="font-bold text-white mt-0.5">{product.subcategory?.name || 'General Series'}</p>
-              </div>
-            </div>
+              );
+            })}
           </div>
         </div>
 
-        {/* Right Column: Specifications & Quote Configuration */}
-        <div className="lg:col-span-6 space-y-8">
-          
-          {/* Header & Badges */}
-          <div className="space-y-3">
-            <div className="flex flex-wrap items-center gap-2">
-              <span className="bg-[#C5A55A] text-[#090909] text-xs font-black uppercase tracking-wider px-3 py-1 rounded-full font-serif shadow-sm">
-                {product.type?.name || 'Trophy'}
-              </span>
-              {product.collections?.map((c: any) => (
-                <span key={c.id} className="bg-gray-100 text-[#1A1F36] text-xs font-extrabold px-2.5 py-1 rounded-full border border-gray-300">
-                  ★ {c.name}
-                </span>
-              ))}
-            </div>
-
-            <h1 className="text-3xl sm:text-4xl font-black uppercase font-serif text-[#1A1F36] tracking-tight leading-tight">
+        {/* Details Column (5 Cols) */}
+        <div className="lg:col-span-5 flex flex-col pt-4 lg:pt-0 justify-between h-full">
+          <div>
+            <h1 className="font-display text-3xl sm:text-4xl md:text-5xl text-foreground tracking-tight font-light mb-3">
               {product.name}
             </h1>
-
-            <p className="text-sm text-gray-600 leading-relaxed font-sans pt-1">
-              {product.detailedDescription || product.shortDescription || 'Designed for corporate excellence and prestige events. Precision crafted with weight-balanced structure and customizable engraving plate.'}
+            <p className="font-sans text-sm sm:text-base md:text-lg text-muted-foreground mb-6 leading-relaxed">
+              {product.detailedDescription || product.shortDescription || 'A masterpiece of optical crystal and brushed aerospace-grade metal, engineered to honor unparalleled excellence and championship legacy.'}
             </p>
-          </div>
-
-          {/* Material, Theme & Shape Tag Chips */}
-          <div className="space-y-3 pt-4 border-t border-gray-200">
-            <div className="flex items-center space-x-2 text-xs font-black uppercase text-gray-500 tracking-wider">
-              <Tag className="w-4 h-4 text-[#C5A55A]" />
-              <span>Structural Components</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {product.materials?.map((m: any) => (
-                <span key={m.id} className="bg-amber-50 text-[#1A1F36] border border-amber-200 text-xs font-bold px-3 py-1 rounded-lg">
-                  Material: {m.name}
-                </span>
-              ))}
-              {product.themes?.map((t: any) => (
-                <span key={t.id} className="bg-blue-50 text-blue-900 border border-blue-200 text-xs font-bold px-3 py-1 rounded-lg">
-                  Theme: {t.name}
-                </span>
-              ))}
-              {product.shapes?.map((s: any) => (
-                <span key={s.id} className="bg-purple-50 text-purple-900 border border-purple-200 text-xs font-bold px-3 py-1 rounded-lg">
-                  Shape: {s.name}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          {/* 2D PRICING MATRIX TABLE (Size vs Weight vs Qty Brackets) */}
-          <div className="space-y-4 pt-4 border-t border-gray-200">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-black font-serif uppercase text-[#1A1F36] tracking-wider flex items-center space-x-2">
-                <Layers className="w-4 h-4 text-[#C5A55A]" />
-                <span>2D Wholesale Pricing Matrix</span>
-              </h3>
-              <span className="text-[11px] bg-emerald-100 text-emerald-800 font-black uppercase px-2 py-0.5 rounded">
-                Transparent Direct-from-Factory
-              </span>
+            <div className="text-2xl sm:text-3xl font-sans font-bold text-primary mb-8 tracking-tight">
+              Starting From {minStartingPrice}
             </div>
 
-            {matrix.length > 0 ? (
-              <div className="overflow-x-auto rounded-2xl border border-gray-200 shadow-sm">
-                <table className="w-full text-left border-collapse text-xs">
-                  <thead className="bg-[#1A1F36] text-white font-serif uppercase tracking-wider text-[11px]">
-                    <tr>
-                      <th className="py-3 px-4 border-r border-white/10">Size Label & Dimensions (in {product.sizeUnit || 'cm'})</th>
-                      <th className="py-3 px-4 border-r border-white/10">Weight</th>
-                      <th className="py-3 px-4 border-r border-white/10">Qty Bracket</th>
-                      <th className="py-3 px-4 text-right text-[#C5A55A]">Wholesale Price / Piece</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-200 bg-white font-medium">
-                    {matrix.map((row: any, idx: number) => {
-                      const isSelected = selectedSizeLabel === row.sizeLabel;
-                      return (
-                        <tr
-                          key={row.id || idx}
-                          onClick={() => setSelectedSizeLabel(row.sizeLabel || `Tier ${idx + 1}`)}
-                          className={`cursor-pointer transition-colors ${
-                            isSelected ? 'bg-amber-50/80 font-bold' : 'hover:bg-gray-50'
-                          }`}
-                        >
-                          <td className="py-3 px-4 border-r border-gray-100">
-                            <div className="flex items-center space-x-2">
-                              <span className={`w-2 h-2 rounded-full ${isSelected ? 'bg-[#C5A55A]' : 'bg-gray-300'}`} />
-                              <span className="text-[#1A1F36] font-bold">{row.sizeLabel || 'Standard Variant'}</span>
-                            </div>
-                            <div className="text-[10px] text-gray-500 mt-0.5 font-mono">
-                              L: {row.length || 'N/A'} × B: {row.breadth || 'N/A'} × H: {row.height || 'N/A'} {product.sizeUnit}
-                            </div>
-                          </td>
-                          <td className="py-3 px-4 border-r border-gray-100 font-mono text-gray-600">
-                            {row.weight ? `${row.weight} grams` : 'Standard'}
-                          </td>
-                          <td className="py-3 px-4 border-r border-gray-100 font-mono font-extrabold text-[#1A1F36]">
-                            ≥ {row.quantity} Pieces
-                          </td>
-                          <td className="py-3 px-4 text-right font-mono font-black text-sm text-[#C5A55A]">
-                            ₹{Number(row.pricePerPiece).toLocaleString()}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
+            {/* Specs Icon Grid (2 Columns with dashed border) */}
+            <div className="grid grid-cols-2 gap-y-5 gap-x-6 py-6 border-y border-dashed border-border mb-8">
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-muted-foreground flex items-center gap-1.5">
+                  <Barcode className="w-3.5 h-3.5 text-primary" />
+                  <span>SKU</span>
+                </span>
+                <span className="text-sm font-semibold text-foreground font-mono">{product.sku || 'TR-CRY-001'}</span>
               </div>
-            ) : (
-              <div className="p-4 rounded-xl bg-gray-50 border border-gray-200 text-xs font-semibold text-gray-600 flex items-center justify-between">
-                <span>Custom dimension & wholesale pricing tiers available upon quotation submission.</span>
-                <span className="font-bold text-[#1A1F36]">{product.priceRange}</span>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-muted-foreground flex items-center gap-1.5">
+                  <Folder className="w-3.5 h-3.5 text-primary" />
+                  <span>Category</span>
+                </span>
+                <span className="text-sm font-semibold text-foreground">{categoryLabel}</span>
               </div>
-            )}
-
-            <p className="text-[11px] text-gray-500 italic">
-              * Click a table row above to select your preferred dimension tier for the inquiry basket.
-            </p>
-          </div>
-
-          {/* Included Customization Options */}
-          <div className="space-y-3 pt-4 border-t border-gray-200">
-            <h4 className="text-xs font-black uppercase tracking-wider text-[#1A1F36] font-serif">
-              Complimentary Customization Perks
-            </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
-              {customizationOptions.map((opt: string, idx: number) => (
-                <div key={idx} className="flex items-center space-x-2 bg-gray-50 p-2.5 rounded-xl border border-gray-200/80 font-semibold text-gray-800">
-                  <Check className="w-4 h-4 text-emerald-600 flex-shrink-0 stroke-[3]" />
-                  <span>{opt}</span>
-                </div>
-              ))}
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-muted-foreground flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5 text-primary" />
+                  <span>Subcategory</span>
+                </span>
+                <span className="text-sm font-semibold text-foreground">{subcategoryLabel}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-muted-foreground flex items-center gap-1.5">
+                  <Award className="w-3.5 h-3.5 text-primary" />
+                  <span>Type</span>
+                </span>
+                <span className="text-sm font-semibold text-foreground">{typeLabel}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-muted-foreground flex items-center gap-1.5">
+                  <Gem className="w-3.5 h-3.5 text-primary" />
+                  <span>Material</span>
+                </span>
+                <span className="text-sm font-semibold text-foreground truncate" title={materialLabel}>{materialLabel}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-muted-foreground flex items-center gap-1.5">
+                  <Hexagon className="w-3.5 h-3.5 text-primary" />
+                  <span>Shape</span>
+                </span>
+                <span className="text-sm font-semibold text-foreground">{shapeLabel}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-muted-foreground flex items-center gap-1.5">
+                  <Star className="w-3.5 h-3.5 text-primary" />
+                  <span>Theme</span>
+                </span>
+                <span className="text-sm font-semibold text-foreground">{themeLabel}</span>
+              </div>
+              <div className="flex flex-col gap-1">
+                <span className="text-[10px] uppercase font-mono font-bold tracking-widest text-muted-foreground flex items-center gap-1.5">
+                  <Weight className="w-3.5 h-3.5 text-primary" />
+                  <span>Base Weight</span>
+                </span>
+                <span className="text-sm font-semibold text-foreground font-mono">{matrixRows[0]?.weight || '1.2 kg'}</span>
+              </div>
             </div>
-          </div>
 
-          {/* INQUIRY BASKET CONFIGURATION BOX */}
-          <div className="bg-[#1A1F36] text-white rounded-3xl p-7 border-2 border-[#C5A55A] shadow-xl space-y-6">
-            <div className="flex items-center justify-between">
+            {/* REQUIREMENT #1: Available Colors & Available Sizes with L×B×H & Units */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-8">
               <div>
-                <span className="text-[10px] uppercase font-black tracking-widest text-[#C5A55A]">Selected Quotation Tier</span>
-                <h3 className="text-lg font-bold font-serif text-white">{selectedSizeLabel}</h3>
+                <h4 className="text-[10px] uppercase font-mono font-bold tracking-widest text-muted-foreground mb-2">Available Colors & Finishes</h4>
+                <p className="text-sm text-foreground font-medium">Crystal, Polished Gold, Sterling Silver, Matte Obsidian</p>
               </div>
-              <div className="text-right">
-                <span className="text-[10px] uppercase font-black tracking-widest text-gray-400">Estimated Rate</span>
-                <p className="text-2xl font-mono font-black text-[#C5A55A]">
-                  {currentPrice ? `₹${currentPrice.toLocaleString()} / pc` : product.priceRange}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-col sm:flex-row items-center gap-4 pt-2 border-t border-white/10">
-              <div className="w-full sm:w-auto flex items-center justify-between bg-white/10 border border-white/20 rounded-2xl p-1">
-                <Button
-                  onClick={() => setQuantity(Math.max(1, quantity - 5))}
-                  size="icon"
-                  variant="ghost"
-                  className="w-10 h-10 hover:bg-white/10 text-white font-bold"
-                >
-                  <Minus className="w-4 h-4" />
-                </Button>
-                <div className="px-5 text-center font-mono font-black text-white">
-                  <span className="text-xs block text-gray-400 font-sans font-semibold uppercase">Qty</span>
-                  <span className="text-base">{quantity}</span>
+              <div>
+                <h4 className="text-[10px] uppercase font-mono font-bold tracking-widest text-muted-foreground mb-2 flex items-center gap-1">
+                  <Ruler className="w-3.5 h-3.5" />
+                  <span>Available Sizes (L × B × H & Unit)</span>
+                </h4>
+                <div className="space-y-1">
+                  {matrixRows.map((r: any, i: number) => (
+                    <div key={i} className="text-xs font-mono text-foreground bg-muted border border-border px-2.5 py-1 rounded">
+                      <strong className="text-foreground mr-1.5">{r.sizeLabel}:</strong>
+                      <span>{r.dimString}</span>
+                    </div>
+                  ))}
                 </div>
-                <Button
-                  onClick={() => setQuantity(quantity + 5)}
-                  size="icon"
-                  variant="ghost"
-                  className="w-10 h-10 hover:bg-white/10 text-white font-bold"
-                >
-                  <Plus className="w-4 h-4" />
-                </Button>
               </div>
-
-              <Button
-                onClick={handleAddToInquiry}
-                className={`flex-1 w-full h-14 rounded-2xl font-black uppercase tracking-wider text-xs sm:text-sm shadow-2xl transition-all duration-300 flex items-center justify-center space-x-2.5 ${
-                  isInInquiry
-                    ? 'bg-emerald-600 text-white hover:bg-emerald-700'
-                    : 'bg-[#C5A55A] text-[#090909] hover:bg-[#d5b568] shadow-[0_0_25px_rgba(197,165,90,0.5)]'
-                }`}
-              >
-                <ShoppingBag className="w-5 h-5 stroke-[2.5]" />
-                <span>{isInInquiry ? 'Update Quantity in Inquiry Basket' : 'Add to Wholesale Inquiry Basket'}</span>
-              </Button>
             </div>
+
+            {/* Customization Checkboxes Grid */}
+            <div className="mb-8">
+              <h4 className="text-[10px] uppercase font-mono font-bold tracking-widest text-muted-foreground mb-3">Complimentary Customization</h4>
+              <div className="grid grid-cols-2 gap-y-2.5 gap-x-4">
+                <div className="flex items-center gap-2 text-sm text-foreground font-medium">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>Logo Laser Engraving</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-foreground font-medium">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>Recipient Name Inscription</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-foreground font-medium">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>Tournament / Event Text</span>
+                </div>
+                <div className="flex items-center gap-2 text-sm text-foreground font-medium">
+                  <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span>Velvet Presentation Box</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Delivery Information Panel */}
+            <div className="p-5 bg-card border border-border rounded-2xl mb-8 shadow-sm">
+              <h4 className="text-[10px] uppercase font-mono font-bold tracking-widest text-muted-foreground mb-2">Delivery & Fulfillment Information</h4>
+              <div className="flex justify-between items-center text-sm">
+                <span className="font-medium text-foreground">Bespoke Made-To-Order</span>
+                <span className="font-bold font-mono text-primary bg-primary/10 border border-primary/30 px-3 py-0.5 rounded-full">
+                  7–10 Working Days
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* REQUIREMENT #2: Action Buttons (SEND INQUIRY & CALL) */}
+          <div className="flex flex-col gap-3.5 mt-auto pt-4">
+            <button
+              type="button"
+              onClick={handleSendInquiry}
+              className="w-full py-4 btn-primary text-white font-black text-xs sm:text-sm uppercase tracking-widest rounded-xl hover:shadow-lg transition-all duration-300 transform hover:scale-[1.01] flex items-center justify-center gap-2.5"
+            >
+              <Mail className="w-5 h-5 stroke-[2.5]" />
+              <span>SEND INQUIRY</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={handleCallWorkshop}
+              className="w-full py-4 bg-transparent border-2 border-primary text-primary hover:bg-primary/10 font-bold text-xs sm:text-sm uppercase tracking-widest rounded-xl transition-all duration-300 flex items-center justify-center gap-2.5 shadow-sm"
+            >
+              <PhoneCall className="w-5 h-5" />
+              <span>CALL (+91 98765 43210)</span>
+            </button>
           </div>
 
         </div>
 
       </div>
 
-      {/* 2. RELATED SHOWROOM AWARDS */}
-      {relatedProducts.length > 0 && (
-        <div className="space-y-8 pt-12 border-t-2 border-gray-200">
+      {/* DETAILS & PRICING BENTO GRID */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-20">
+        
+        {/* Left Info Pane */}
+        <div className="bg-card border border-border p-8 sm:p-10 rounded-2xl flex flex-col justify-between shadow-sm">
+          <div>
+            <h3 className="font-display text-2xl sm:text-3xl text-foreground mb-4 font-normal tracking-tight">
+              Precision Craftsmanship
+            </h3>
+            <p className="font-sans text-sm sm:text-base text-muted-foreground leading-relaxed">
+              Each recognition piece undergoes a rigorous 14-step inspection and hand-polishing process to ensure flawless optical clarity and weight balance. The solid base is CNC milled to microscopic tolerances before being finished by seasoned artisans.
+            </p>
+          </div>
+          <Gem className="w-10 h-10 text-primary mt-8 animate-pulse" />
+        </div>
+
+        {/* Pricing Matrix Table (2 Cols) with REQUIREMENT #1: L×B×H & Units */}
+        <div className="lg:col-span-2 bg-card border border-border p-6 sm:p-8 md:p-10 rounded-2xl shadow-sm overflow-hidden flex flex-col justify-between">
+          <div>
+            <h3 className="text-xs font-mono font-bold text-foreground mb-6 uppercase tracking-[0.2em] border-b border-border pb-4 flex items-center justify-between">
+              <span>Corporate Volume Pricing Matrix</span>
+              <span className="text-primary text-[10px] font-mono font-normal">Factory Direct Wholesale Tiers</span>
+            </h3>
+            
+            <div className="overflow-x-auto">
+              <table className="w-full text-left font-sans text-xs sm:text-sm border-collapse">
+                <thead>
+                  <tr className="text-muted-foreground font-mono border-b border-border text-[10px] uppercase tracking-wider">
+                    <th className="py-3.5 px-3 font-bold">Size Label & L×B×H (in {unit})</th>
+                    <th className="py-3.5 px-3 font-bold">Weight</th>
+                    <th className="py-3.5 px-2 font-bold">Qty 1</th>
+                    <th className="py-3.5 px-2 font-bold">Qty 5</th>
+                    <th className="py-3.5 px-2 font-bold">Qty 10</th>
+                    <th className="py-3.5 px-2 font-bold">Qty 25</th>
+                    <th className="py-3.5 px-2 font-bold">Qty 50</th>
+                    <th className="py-3.5 px-2 font-bold">Qty 100+</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border font-medium">
+                  {displayMatrixRows.map((row: any, idx: number) => {
+                    return (
+                      <tr
+                        key={idx}
+                        className="text-foreground transition-colors group hover:bg-muted"
+                      >
+                        <td className="py-4 px-3 font-mono">
+                          <div className="font-bold text-foreground">{row.sizeLabel}</div>
+                          <div className="text-[10px] text-muted-foreground mt-0.5">{row.dimString}</div>
+                        </td>
+                        <td className="py-4 px-3 font-mono text-muted-foreground">{row.weight}</td>
+                        <td className="py-4 px-2 font-mono">{row.qty1Fmt}</td>
+                        <td className="py-4 px-2 font-mono">{row.qty5Fmt}</td>
+                        <td className="py-4 px-2 font-mono">{row.qty10Fmt}</td>
+                        <td className="py-4 px-2 font-mono">{row.qty25Fmt}</td>
+                        <td className="py-4 px-2 font-mono">{row.qty50Fmt}</td>
+                        <td className="py-4 px-2 font-mono font-bold">{row.qty100Fmt}</td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <p className="text-[11px] text-muted-foreground italic mt-6 font-sans">
+            * All wholesale rates above include complimentary custom laser plate engraving and presentation box packaging.
+          </p>
+        </div>
+
+        {/* Product Specifications Bento Panel (3 Cols Span Below Table) with REQUIREMENT #1: L×B×H & Units */}
+        <div className="lg:col-span-3 bg-card border border-border p-8 sm:p-10 rounded-2xl shadow-sm mt-2">
+          <h3 className="text-xs font-mono font-bold text-foreground mb-6 uppercase tracking-[0.2em] border-b border-border pb-4 flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-primary" />
+            <span>Complete Technical Specifications</span>
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 sm:gap-x-16 font-sans text-sm">
+            <div className="flex flex-col">
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Product Code (SKU)</span>
+                <span className="font-mono text-foreground font-bold">{product.sku || 'TR-CRY-001'}</span>
+              </div>
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Category Classification</span>
+                <span className="text-foreground font-semibold">{categoryLabel}</span>
+              </div>
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Subcategory Division</span>
+                <span className="text-foreground font-semibold">{subcategoryLabel}</span>
+              </div>
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Award Type</span>
+                <span className="text-foreground font-semibold">{typeLabel}</span>
+              </div>
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Primary Craft Material</span>
+                <span className="text-foreground font-semibold">{materialLabel}</span>
+              </div>
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Geometric Shape</span>
+                <span className="text-foreground font-semibold">{shapeLabel}</span>
+              </div>
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Surface Finish</span>
+                <span className="text-foreground font-semibold">Mirror Polished & Brushed Lacquer</span>
+              </div>
+            </div>
+
+            <div className="flex flex-col">
+              {/* REQUIREMENT #1: Specification Dimensions in L×B×H format WITH units */}
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Physical Dimensions (L × B × H)</span>
+                <span className="font-mono text-foreground font-semibold">
+                  {baseL} × {baseB} × {baseH} {unit}
+                </span>
+              </div>
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Base Plate Material</span>
+                <span className="text-foreground font-semibold">Weighted Rosewood & Obsidian Marble</span>
+              </div>
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Unit Weight Threshold</span>
+                <span className="font-mono text-foreground font-semibold">{matrixRows[0]?.weight} – {matrixRows[matrixRows.length - 1]?.weight}</span>
+              </div>
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Customization Technique</span>
+                <span className="text-foreground font-semibold">Computerized UV & Laser Engraving</span>
+              </div>
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Protective Packaging</span>
+                <span className="text-foreground font-semibold">Individual Satin-Lined Gift Box</span>
+              </div>
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Factory Production Time</span>
+                <span className="text-foreground font-semibold">7–10 Working Days</span>
+              </div>
+              <div className="flex justify-between py-3.5 border-b border-border">
+                <span className="text-muted-foreground font-medium">Country of Origin</span>
+                <span className="text-foreground font-semibold">Made with Pride in India 🇮🇳</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      {/* RELATED SHOWROOM AWARDS */}
+      {relatedProducts && relatedProducts.length > 0 && (
+        <div className="space-y-8 pt-12 border-t border-border">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
             <div>
-              <span className="text-xs font-black uppercase tracking-widest text-[#C5A55A] bg-[#1A1F36] px-3 py-1 rounded-full">
-                Same Classification
+              <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-primary bg-primary/10 border border-primary/20 px-3.5 py-1.5 rounded-full">
+                Same Division
               </span>
-              <h2 className="text-2xl sm:text-3xl font-black font-serif text-[#1A1F36] mt-2 uppercase">
-                Related {product.category?.name || 'Championship'} Awards
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-display font-light text-foreground mt-3">
+                Related {categoryLabel} Awards
               </h2>
             </div>
             <Link href={`/catalog?categorySlug=${product.category?.slug || 'all'}`}>
-              <Button variant="outline" className="text-xs font-extrabold uppercase border-[#1A1F36] text-[#1A1F36] h-10 px-4 rounded-xl">
-                View All in Category
-              </Button>
+              <button className="text-xs font-bold font-mono uppercase bg-transparent border border-border hover:border-primary text-foreground hover:text-primary px-5 py-2.5 rounded-xl transition-all">
+                View All {categoryLabel}
+              </button>
             </Link>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {relatedProducts.map((rel) => (
-              <ProductCard key={rel.id} product={rel} />
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+            {relatedProducts.slice(0, 4).map((rel) => (
+              <ProductCard key={rel.id} product={rel} showAddButton={false} />
             ))}
           </div>
         </div>
       )}
 
-    </div>
+    </main>
   );
 }

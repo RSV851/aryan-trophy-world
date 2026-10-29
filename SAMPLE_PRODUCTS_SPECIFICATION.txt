@@ -1,0 +1,488 @@
+========================================================================================
+             ARYAN TROPHY WORLD — 40 SAMPLE PRODUCTS MASTER SPECIFICATIONS
+========================================================================================
+This master specification document guarantees 100% catalog coverage & multi-tag support:
+  - 40 Total Master Products (Minimum 1 per subcategory + multi-options for popular items)
+  - 4 Categories (Sports, Corporate, Academic, Religious & Cultural)
+  - 25 Subcategories (All 25 subcategories covered with 1 to 3 product choices)
+  - 6 Product Types (Metal Trophy, Crystal Plaque, Wooden Shield, Custom Medal, Acrylic Star, Lapel Pin)
+  - 6 Materials (Many-to-Many junction support: Optical Crystal, Solid Brass & Gold, Teak Hardwood, Cast Resin, Acrylic Glass, Stainless Steel)
+  - 6 Themes (Many-to-Many junction support: Victory & Triumph, Leadership & Excellence, Academic & Knowledge, Sports & Athletics, Corporate Milestone, Spiritual & Sacred Heritage)
+  - 5 Shapes (Many-to-Many junction support: Star & Celestial, Shield & Crest, Grand Cup, Flame & Diamond, Obelisk Tower)
+  - 6 Collections (Many-to-Many junction support: Best Sellers, Featured, Presidential Series, Tournament Edition, Budget Champions, Heritage Craftsmanship)
+  - Multiple 2D Pricing Grid Size Variations for EVERY single product!
+
+========================================================================================
+                                PRODUCTS LIST (1 TO 40)
+========================================================================================
+
+[PRODUCT 1] SKU: ATW-SPT-001
+  Name: Grand Champion IPL Cricket Trophy
+  Category: Sports Trophies | Subcategory: Cricket
+  Type: Metal Trophy
+  Shapes (Multi-Tag): Grand Cup, Flame & Diamond
+  Materials (Multi-Tag): Solid Brass & Gold, Optical Crystal
+  Themes (Multi-Tag): Victory & Triumph, Sports & Athletics
+  Collections (Multi-Tag): Tournament Edition, Presidential Series, best-sellers
+  Size Variations:
+    - Small (12"): 12x10x30 cm (2.1 kg) -> 1-5 pcs @ ₹12,500 | 6-20 pcs @ ₹10,800 | 21+ pcs @ ₹9,500
+    - Medium (15"): 15x12x38 cm (2.8 kg) -> 1-5 pcs @ ₹15,800 | 6-20 pcs @ ₹13,800 | 21+ pcs @ ₹12,200
+    - Large (18"): 18x14x45 cm (3.5 kg) -> 1-5 pcs @ ₹18,500 | 6-20 pcs @ ₹16,500 | 21+ pcs @ ₹14,800
+
+[PRODUCT 2] SKU: ATW-SPT-002
+  Name: Golden Willow Cricket Batter Award
+  Category: Sports Trophies | Subcategory: Cricket
+  Type: Wooden Shield
+  Shapes (Multi-Tag): Shield & Crest, Star & Celestial
+  Materials (Multi-Tag): Teak Hardwood, Solid Brass & Gold
+  Themes (Multi-Tag): Sports & Athletics
+  Collections (Multi-Tag): Heritage Craftsmanship, Tournament Edition
+  Size Variations:
+    - Junior (9"): 15x10x22 cm (1.2 kg) -> 1-10 pcs @ ₹3,400 | 11-50 pcs @ ₹2,800
+    - Senior (12"): 20x14x30 cm (1.9 kg) -> 1-10 pcs @ ₹5,200 | 11-50 pcs @ ₹4,300
+
+[PRODUCT 3] SKU: ATW-SPT-003
+  Name: Premier League Golden Boot Football Award
+  Category: Sports Trophies | Subcategory: Football
+  Type: Custom Medal
+  Shapes (Multi-Tag): Star & Celestial, Shield & Crest
+  Materials (Multi-Tag): Solid Brass & Gold, Cast Resin
+  Themes (Multi-Tag): Sports & Athletics, Victory & Triumph
+  Collections (Multi-Tag): Tournament Edition, best-sellers, featured
+  Size Variations:
+    - Silver Boot: 10x8x22 cm (1.2 kg) -> 1-10 pcs @ ₹5,500 | 11-50 pcs @ ₹4,600
+    - Golden Boot: 14x10x28 cm (1.9 kg) -> 1-10 pcs @ ₹8,900 | 11-50 pcs @ ₹7,400
+
+[PRODUCT 4] SKU: ATW-SPT-004
+  Name: Champions League Football Striker Cup
+  Category: Sports Trophies | Subcategory: Football
+  Type: Metal Trophy
+  Shapes (Multi-Tag): Grand Cup
+  Materials (Multi-Tag): Stainless Steel, Optical Crystal
+  Themes (Multi-Tag): Sports & Athletics
+  Collections (Multi-Tag): Tournament Edition, Presidential Series
+  Size Variations:
+    - Standard (14"): 14x11x35 cm (2.4 kg) -> 1-5 pcs @ ₹13,500 | 6-20 pcs @ ₹11,800
+    - Pro (18"): 18x14x45 cm (3.8 kg) -> 1-5 pcs @ ₹21,000 | 6-20 pcs @ ₹18,500
+
+[PRODUCT 5] SKU: ATW-SPT-005
+  Name: Shuttlecock Smash Badminton Trophy
+  Category: Sports Trophies | Subcategory: Badminton
+  Type: Acrylic Star
+  Shapes (Multi-Tag): Flame & Diamond, Star & Celestial
+  Materials (Multi-Tag): Acrylic Glass, Stainless Steel
+  Themes (Multi-Tag): Sports & Athletics
+  Collections (Multi-Tag): Budget Champions
+  Size Variations:
+    - Compact (8"): 8x6x20 cm (0.7 kg) -> 1-15 pcs @ ₹2,400 | 16-50 pcs @ ₹1,950
+    - Premier (10"): 10x8x26 cm (1.1 kg) -> 1-15 pcs @ ₹3,200 | 16-50 pcs @ ₹2,600
+
+[PRODUCT 6] SKU: ATW-SPT-006
+  Name: Grand Slam Aces Tennis Plaque
+  Category: Sports Trophies | Subcategory: Tennis
+  Type: Crystal Plaque
+  Shapes (Multi-Tag): Shield & Crest, Obelisk Tower
+  Materials (Multi-Tag): Optical Crystal, Solid Brass & Gold
+  Themes (Multi-Tag): Sports & Athletics, Victory & Triumph
+  Collections (Multi-Tag): Presidential Series, featured
+  Size Variations:
+    - Classic (9"): 10x8x24 cm (1.4 kg) -> 1-10 pcs @ ₹6,200 | 11-40 pcs @ ₹5,100
+    - Executive (12"): 14x10x30 cm (2.2 kg) -> 1-10 pcs @ ₹8,800 | 11-40 pcs @ ₹7,400
+
+[PRODUCT 7] SKU: ATW-SPT-007
+  Name: Masters Open Golf Championship Urn
+  Category: Sports Trophies | Subcategory: Golf
+  Type: Metal Trophy
+  Shapes (Multi-Tag): Grand Cup, Flame & Diamond
+  Materials (Multi-Tag): Stainless Steel, Solid Brass & Gold
+  Themes (Multi-Tag): Sports & Athletics, Victory & Triumph
+  Collections (Multi-Tag): Presidential Series, Tournament Edition
+  Size Variations:
+    - Club Trophy: 15x12x36 cm (2.6 kg) -> 1-5 pcs @ ₹14,500 | 6-20 pcs @ ₹12,800
+    - Masters Urn: 20x16x50 cm (4.2 kg) -> 1-5 pcs @ ₹24,000 | 6-20 pcs @ ₹21,000
+
+[PRODUCT 8] SKU: ATW-SPT-008
+  Name: Slam Dunk Basketball Champion Cup
+  Category: Sports Trophies | Subcategory: Basketball
+  Type: Cast Resin
+  Shapes (Multi-Tag): Grand Cup, Star & Celestial
+  Materials (Multi-Tag): Cast Resin, Solid Brass & Gold
+  Themes (Multi-Tag): Sports & Athletics
+  Collections (Multi-Tag): Tournament Edition
+  Size Variations:
+    - Junior Cup: 12x10x28 cm (1.3 kg) -> 1-10 pcs @ ₹4,200 | 11-50 pcs @ ₹3,500
+    - Varsity Cup: 15x12x35 cm (2.1 kg) -> 1-10 pcs @ ₹6,500 | 11-50 pcs @ ₹5,400
+
+[PRODUCT 9] SKU: ATW-SPT-009
+  Name: Aqua Sprint Swimming Gold Award
+  Category: Sports Trophies | Subcategory: Swimming
+  Type: Custom Medal
+  Shapes (Multi-Tag): Star & Celestial
+  Materials (Multi-Tag): Solid Brass & Gold, Acrylic Glass
+  Themes (Multi-Tag): Sports & Athletics
+  Collections (Multi-Tag): Budget Champions
+  Size Variations:
+    - 6 cm Medallion: 6x6x0.8 cm (0.2 kg) -> 1-50 pcs @ ₹850 | 51-200 pcs @ ₹620
+    - 8 cm Medallion: 8x8x1.0 cm (0.35 kg) -> 1-50 pcs @ ₹1,350 | 51-200 pcs @ ₹980
+
+[PRODUCT 10] SKU: ATW-SPT-010
+  Name: National Sprint Athletics Victory Shield
+  Category: Sports Trophies | Subcategory: Athletics
+  Type: Wooden Shield
+  Shapes (Multi-Tag): Shield & Crest, Flame & Diamond
+  Materials (Multi-Tag): Teak Hardwood, Solid Brass & Gold
+  Themes (Multi-Tag): Sports & Athletics, Victory & Triumph
+  Collections (Multi-Tag): Heritage Craftsmanship, Tournament Edition
+  Size Variations:
+    - Junior Shield: 16x12x20 cm (1.1 kg) -> 1-10 pcs @ ₹3,100 | 11-50 pcs @ ₹2,500
+    - Senior Shield: 22x16x28 cm (1.8 kg) -> 1-10 pcs @ ₹4,800 | 11-50 pcs @ ₹3,900
+
+[PRODUCT 11] SKU: ATW-COR-011
+  Name: Employee of the Month Star Award
+  Category: Corporate Awards | Subcategory: Employee of the Month
+  Type: Acrylic Star
+  Shapes (Multi-Tag): Star & Celestial, Obelisk Tower
+  Materials (Multi-Tag): Acrylic Glass, Optical Crystal
+  Themes (Multi-Tag): Corporate Milestone, Victory & Triumph
+  Collections (Multi-Tag): Budget Champions, featured, best-sellers
+  Size Variations:
+    - Desk Star: 8x6x16 cm (0.5 kg) -> 1-20 pcs @ ₹1,600 | 21-100 pcs @ ₹1,250
+    - Classic Star: 10x8x22 cm (0.9 kg) -> 1-20 pcs @ ₹2,800 | 21-100 pcs @ ₹2,200
+
+[PRODUCT 12] SKU: ATW-COR-012
+  Name: Corporate Star Performer Glass Trophy
+  Category: Corporate Awards | Subcategory: Employee of the Month
+  Type: Crystal Plaque
+  Shapes (Multi-Tag): Star & Celestial, Flame & Diamond
+  Materials (Multi-Tag): Optical Crystal, Stainless Steel
+  Themes (Multi-Tag): Corporate Milestone, Leadership & Excellence
+  Collections (Multi-Tag): Presidential Series, featured
+  Size Variations:
+    - Standard (9"): 10x8x23 cm (1.3 kg) -> 1-10 pcs @ ₹4,900 | 11-50 pcs @ ₹4,100
+    - Premium (12"): 12x10x30 cm (2.0 kg) -> 1-10 pcs @ ₹7,500 | 11-50 pcs @ ₹6,300
+
+[PRODUCT 13] SKU: ATW-COR-013
+  Name: Executive Sales Champion Medallion
+  Category: Corporate Awards | Subcategory: Sales Champion
+  Type: Custom Medal
+  Shapes (Multi-Tag): Flame & Diamond, Shield & Crest
+  Materials (Multi-Tag): Solid Brass & Gold, Stainless Steel
+  Themes (Multi-Tag): Corporate Milestone, Leadership & Excellence
+  Collections (Multi-Tag): best-sellers, Budget Champions
+  Size Variations:
+    - 6 cm Badge: 6x6x0.8 cm (0.15 kg) -> 1-50 pcs @ ₹950 | 51-200 pcs @ ₹720
+    - 8 cm Medallion: 8x8x1.0 cm (0.30 kg) -> 1-50 pcs @ ₹1,500 | 51-200 pcs @ ₹1,100
+
+[PRODUCT 14] SKU: ATW-COR-014
+  Name: Sales Achiever Target Breaker Plaque
+  Category: Corporate Awards | Subcategory: Sales Champion
+  Type: Crystal Plaque
+  Shapes (Multi-Tag): Obelisk Tower, Flame & Diamond
+  Materials (Multi-Tag): Optical Crystal, Teak Hardwood
+  Themes (Multi-Tag): Corporate Milestone
+  Collections (Multi-Tag): Presidential Series, best-sellers
+  Size Variations:
+    - Silver Tier: 10x8x24 cm (1.5 kg) -> 1-10 pcs @ ₹6,500 | 11-50 pcs @ ₹5,400
+    - Gold Tier: 13x10x32 cm (2.3 kg) -> 1-10 pcs @ ₹9,900 | 11-50 pcs @ ₹8,300
+
+[PRODUCT 15] SKU: ATW-COR-015
+  Name: Distinguished Career Lifetime Achievement Monument
+  Category: Corporate Awards | Subcategory: Lifetime Achievement
+  Type: Crystal Plaque
+  Shapes (Multi-Tag): Obelisk Tower, Flame & Diamond
+  Materials (Multi-Tag): Optical Crystal, Stainless Steel
+  Themes (Multi-Tag): Leadership & Excellence, Corporate Milestone
+  Collections (Multi-Tag): Presidential Series, Heritage Craftsmanship, featured
+  Size Variations:
+    - 10" Plaque: 10x8x25 cm (1.7 kg) -> 1-10 pcs @ ₹8,500 | 11-50 pcs @ ₹7,200
+    - 14" Monument: 14x12x35 cm (2.8 kg) -> 1-10 pcs @ ₹14,000 | 11-50 pcs @ ₹12,100
+
+[PRODUCT 16] SKU: ATW-COR-016
+  Name: Rising Star Performer Crystal Obelisk
+  Category: Corporate Awards | Subcategory: Star Performer
+  Type: Crystal Plaque
+  Shapes (Multi-Tag): Obelisk Tower, Star & Celestial
+  Materials (Multi-Tag): Optical Crystal
+  Themes (Multi-Tag): Leadership & Excellence
+  Collections (Multi-Tag): featured, Presidential Series
+  Size Variations:
+    - 8" Obelisk: 8x6x20 cm (1.1 kg) -> 1-10 pcs @ ₹5,800 | 11-50 pcs @ ₹4,900
+    - 11" Obelisk: 11x9x28 cm (1.8 kg) -> 1-10 pcs @ ₹8,200 | 11-50 pcs @ ₹6,900
+
+[PRODUCT 17] SKU: ATW-COR-017
+  Name: Visionary Leadership Excellence Trophy
+  Category: Corporate Awards | Subcategory: Leadership Excellence
+  Type: Metal Trophy
+  Shapes (Multi-Tag): Flame & Diamond, Grand Cup
+  Materials (Multi-Tag): Solid Brass & Gold, Teak Hardwood
+  Themes (Multi-Tag): Leadership & Excellence
+  Collections (Multi-Tag): Presidential Series, best-sellers
+  Size Variations:
+    - Standard (11"): 11x9x28 cm (1.6 kg) -> 1-10 pcs @ ₹9,800 | 11-50 pcs @ ₹8,400
+    - Executive (14"): 14x11x36 cm (2.5 kg) -> 1-10 pcs @ ₹13,500 | 11-50 pcs @ ₹11,600
+
+[PRODUCT 18] SKU: ATW-COR-018
+  Name: Veteran Loyalty 10 Years of Service Award
+  Category: Corporate Awards | Subcategory: Years of Service
+  Type: Wooden Shield
+  Shapes (Multi-Tag): Shield & Crest, Obelisk Tower
+  Materials (Multi-Tag): Teak Hardwood, Solid Brass & Gold
+  Themes (Multi-Tag): Corporate Milestone
+  Collections (Multi-Tag): Heritage Craftsmanship, Presidential Series
+  Size Variations:
+    - 9" Shield: 18x14x22 cm (1.3 kg) -> 1-10 pcs @ ₹4,100 | 11-50 pcs @ ₹3,400
+    - 12" Shield: 22x18x30 cm (2.0 kg) -> 1-10 pcs @ ₹5,900 | 11-50 pcs @ ₹4,900
+
+[PRODUCT 19] SKU: ATW-COR-019
+  Name: Corporate Milestones 25 Years Honor Shield
+  Category: Corporate Awards | Subcategory: Years of Service
+  Type: Wooden Shield
+  Shapes (Multi-Tag): Shield & Crest, Flame & Diamond
+  Materials (Multi-Tag): Teak Hardwood, Solid Brass & Gold, Stainless Steel
+  Themes (Multi-Tag): Corporate Milestone, Leadership & Excellence
+  Collections (Multi-Tag): Heritage Craftsmanship, Presidential Series
+  Size Variations:
+    - Silver Jubilee (14"): 24x18x35 cm (2.7 kg) -> 1-5 pcs @ ₹11,200 | 6-20 pcs @ ₹9,500
+
+[PRODUCT 20] SKU: ATW-ACA-020
+  Name: Young Scientist Science Fair Innovation Award
+  Category: Academic Excellence | Subcategory: Science Fair
+  Type: Acrylic Star
+  Shapes (Multi-Tag): Star & Celestial, Flame & Diamond
+  Materials (Multi-Tag): Acrylic Glass, Cast Resin
+  Themes (Multi-Tag): Academic & Knowledge
+  Collections (Multi-Tag): Budget Champions, featured
+  Size Variations:
+    - Junior (7"): 8x6x18 cm (0.6 kg) -> 1-20 pcs @ ₹1,900 | 21-80 pcs @ ₹1,500
+    - Senior (9.5"): 10x8x24 cm (1.0 kg) -> 1-20 pcs @ ₹2,900 | 21-80 pcs @ ₹2,300
+
+[PRODUCT 21] SKU: ATW-ACA-021
+  Name: Valedictorian Top Scholar Crystal Plaque
+  Category: Academic Excellence | Subcategory: Top Scholar
+  Type: Crystal Plaque
+  Shapes (Multi-Tag): Obelisk Tower, Shield & Crest
+  Materials (Multi-Tag): Optical Crystal, Solid Brass & Gold
+  Themes (Multi-Tag): Academic & Knowledge, Leadership & Excellence
+  Collections (Multi-Tag): Presidential Series, featured
+  Size Variations:
+    - Scholar (9"): 10x8x22 cm (1.3 kg) -> 1-10 pcs @ ₹5,400 | 11-50 pcs @ ₹4,500
+    - Valedictorian (12"): 12x10x30 cm (2.1 kg) -> 1-10 pcs @ ₹8,200 | 11-50 pcs @ ₹6,900
+
+[PRODUCT 22] SKU: ATW-ACA-022
+  Name: National Elocution & Debate Champion Crest
+  Category: Academic Excellence | Subcategory: Debate Champion
+  Type: Lapel Pin & Badge
+  Shapes (Multi-Tag): Shield & Crest, Star & Celestial
+  Materials (Multi-Tag): Stainless Steel, Cast Resin
+  Themes (Multi-Tag): Academic & Knowledge
+  Collections (Multi-Tag): Tournament Edition, Budget Champions
+  Size Variations:
+    - 4 cm Pin: 4x4x0.4 cm (0.04 kg) -> 1-50 pcs @ ₹420 | 51-200 pcs @ ₹310
+    - 5.5 cm Badge: 5.5x5.5x0.5 cm (0.08 kg) -> 1-50 pcs @ ₹650 | 51-200 pcs @ ₹480
+
+[PRODUCT 23] SKU: ATW-ACA-023
+  Name: Genius Olympiad Mathematics Gold Shield
+  Category: Academic Excellence | Subcategory: Mathematics Olympiad
+  Type: Wooden Shield
+  Shapes (Multi-Tag): Shield & Crest, Flame & Diamond
+  Materials (Multi-Tag): Teak Hardwood, Solid Brass & Gold
+  Themes (Multi-Tag): Academic & Knowledge
+  Collections (Multi-Tag): Heritage Craftsmanship, Budget Champions
+  Size Variations:
+    - Junior Shield: 15x10x20 cm (1.1 kg) -> 1-10 pcs @ ₹2,800 | 11-50 pcs @ ₹2,200
+    - Senior Shield: 20x15x30 cm (1.8 kg) -> 1-10 pcs @ ₹4,500 | 11-50 pcs @ ₹3,800
+
+[PRODUCT 24] SKU: ATW-ACA-024
+  Name: Chancellor Convocation Graduation Honor Cup
+  Category: Academic Excellence | Subcategory: Graduation Honor
+  Type: Metal Trophy
+  Shapes (Multi-Tag): Grand Cup, Obelisk Tower
+  Materials (Multi-Tag): Solid Brass & Gold, Optical Crystal
+  Themes (Multi-Tag): Academic & Knowledge, Leadership & Excellence
+  Collections (Multi-Tag): Presidential Series, Heritage Craftsmanship
+  Size Variations:
+    - 10" Convocation: 12x10x25 cm (1.7 kg) -> 1-10 pcs @ ₹7,200 | 11-50 pcs @ ₹6,100
+    - 13.5" Honor: 15x12x34 cm (2.6 kg) -> 1-10 pcs @ ₹10,500 | 11-50 pcs @ ₹8,900
+
+[PRODUCT 25] SKU: ATW-ACA-025
+  Name: STEM Academic Research Excellence Trophy
+  Category: Academic Excellence | Subcategory: Science Fair
+  Type: Cast Resin
+  Shapes (Multi-Tag): Flame & Diamond, Star & Celestial
+  Materials (Multi-Tag): Cast Resin, Optical Crystal
+  Themes (Multi-Tag): Academic & Knowledge
+  Collections (Multi-Tag): Tournament Edition, featured
+  Size Variations:
+    - 9" Trophy: 10x8x23 cm (1.2 kg) -> 1-10 pcs @ ₹4,800 | 11-50 pcs @ ₹3,900
+
+[PRODUCT 26] SKU: ATW-REL-026
+  Name: Garba & Dandiya Raas Maha Utsav Trophy
+  Category: Religious & Cultural | Subcategory: Garba & Dandiya Contests
+  Type: Cast Resin
+  Shapes (Multi-Tag): Flame & Diamond, Star & Celestial
+  Materials (Multi-Tag): Cast Resin, Solid Brass & Gold
+  Themes (Multi-Tag): Spiritual & Sacred Heritage, Victory & Triumph
+  Collections (Multi-Tag): Tournament Edition, featured, best-sellers
+  Size Variations:
+    - Shree Edition (10"): 10x8x25 cm (1.4 kg) -> 1-10 pcs @ ₹3,800 | 11-50 pcs @ ₹3,100
+    - Royal Samman (14"): 15x12x35 cm (2.5 kg) -> 1-10 pcs @ ₹6,800 | 11-50 pcs @ ₹5,500
+
+[PRODUCT 27] SKU: ATW-REL-027
+  Name: Navratri Dandiya Queen Gold Award
+  Category: Religious & Cultural | Subcategory: Garba & Dandiya Contests
+  Type: Metal Trophy
+  Shapes (Multi-Tag): Star & Celestial, Grand Cup
+  Materials (Multi-Tag): Solid Brass & Gold, Optical Crystal
+  Themes (Multi-Tag): Spiritual & Sacred Heritage, Victory & Triumph
+  Collections (Multi-Tag): Tournament Edition, best-sellers
+  Size Variations:
+    - Queen Crown (12"): 12x10x30 cm (2.0 kg) -> 1-10 pcs @ ₹7,500 | 11-40 pcs @ ₹6,200
+
+[PRODUCT 28] SKU: ATW-REL-028
+  Name: Deepavali Rangoli & Diya Kalakriti Award
+  Category: Religious & Cultural | Subcategory: Rangoli & Diya Competitions
+  Type: Wooden Shield
+  Shapes (Multi-Tag): Shield & Crest, Flame & Diamond
+  Materials (Multi-Tag): Teak Hardwood, Solid Brass & Gold
+  Themes (Multi-Tag): Spiritual & Sacred Heritage
+  Collections (Multi-Tag): Heritage Craftsmanship
+  Size Variations:
+    - Standard (9"): 18x14x22 cm (1.3 kg) -> 1-10 pcs @ ₹3,400 | 11-50 pcs @ ₹2,800
+    - Grand Award (12"): 22x18x30 cm (2.0 kg) -> 1-10 pcs @ ₹5,200 | 11-50 pcs @ ₹4,300
+
+[PRODUCT 29] SKU: ATW-REL-029
+  Name: Bhajan Sandhya Devotional Singing Samman
+  Category: Religious & Cultural | Subcategory: Devotional Singing Contests
+  Type: Metal Trophy
+  Shapes (Multi-Tag): Grand Cup, Flame & Diamond
+  Materials (Multi-Tag): Solid Brass & Gold, Cast Resin
+  Themes (Multi-Tag): Spiritual & Sacred Heritage
+  Collections (Multi-Tag): Tournament Edition
+  Size Variations:
+    - 9.5" Samman: 11x9x24 cm (1.3 kg) -> 1-10 pcs @ ₹4,200 | 11-50 pcs @ ₹3,500
+    - 12.5" Samman: 14x11x32 cm (2.1 kg) -> 1-10 pcs @ ₹6,900 | 11-50 pcs @ ₹5,800
+
+[PRODUCT 30] SKU: ATW-REL-030
+  Name: Sangeet Sur Devotional Vocalist Plaque
+  Category: Religious & Cultural | Subcategory: Devotional Singing Contests
+  Type: Crystal Plaque
+  Shapes (Multi-Tag): Obelisk Tower, Star & Celestial
+  Materials (Multi-Tag): Optical Crystal, Solid Brass & Gold
+  Themes (Multi-Tag): Spiritual & Sacred Heritage
+  Collections (Multi-Tag): Presidential Series, Heritage Craftsmanship
+  Size Variations:
+    - 10" Plaque: 11x9x26 cm (1.5 kg) -> 1-10 pcs @ ₹5,900 | 11-40 pcs @ ₹4,900
+
+[PRODUCT 31] SKU: ATW-REL-031
+  Name: Natya Kala Cultural Drama Performance Award
+  Category: Religious & Cultural | Subcategory: Cultural Drama & Skits
+  Type: Acrylic Star
+  Shapes (Multi-Tag): Star & Celestial, Flame & Diamond
+  Materials (Multi-Tag): Acrylic Glass, Teak Hardwood
+  Themes (Multi-Tag): Spiritual & Sacred Heritage
+  Collections (Multi-Tag): Budget Champions
+  Size Variations:
+    - Compact (7"): 8x6x18 cm (0.6 kg) -> 1-15 pcs @ ₹1,950 | 16-50 pcs @ ₹1,550
+    - Premier (10"): 10x8x25 cm (1.1 kg) -> 1-15 pcs @ ₹3,100 | 16-50 pcs @ ₹2,500
+
+[PRODUCT 32] SKU: ATW-REL-032
+  Name: Samaj Ratna Social Seva Samman Monument
+  Category: Religious & Cultural | Subcategory: Social Seva Samman
+  Type: Crystal Plaque
+  Shapes (Multi-Tag): Obelisk Tower, Shield & Crest
+  Materials (Multi-Tag): Optical Crystal, Solid Brass & Gold
+  Themes (Multi-Tag): Spiritual & Sacred Heritage, Leadership & Excellence
+  Collections (Multi-Tag): Presidential Series, Heritage Craftsmanship, featured
+  Size Variations:
+    - Seva Plaque (10"): 11x9x25 cm (1.6 kg) -> 1-10 pcs @ ₹6,800 | 11-50 pcs @ ₹5,700
+    - Samaj Ratna (14"): 15x12x35 cm (2.7 kg) -> 1-10 pcs @ ₹11,500 | 11-50 pcs @ ₹9,800
+
+[PRODUCT 33] SKU: ATW-REL-033
+  Name: Manav Seva Philanthropy Honor Shield
+  Category: Religious & Cultural | Subcategory: Social Seva Samman
+  Type: Wooden Shield
+  Shapes (Multi-Tag): Shield & Crest, Flame & Diamond
+  Materials (Multi-Tag): Teak Hardwood, Solid Brass & Gold
+  Themes (Multi-Tag): Spiritual & Sacred Heritage
+  Collections (Multi-Tag): Heritage Craftsmanship, Presidential Series
+  Size Variations:
+    - 11" Shield: 20x15x28 cm (1.7 kg) -> 1-10 pcs @ ₹4,900 | 11-50 pcs @ ₹4,100
+
+[PRODUCT 34] SKU: ATW-REL-034
+  Name: Vedic Recitation Scriptural Scholar Pin Badge
+  Category: Religious & Cultural | Subcategory: Scholarly & Scriptural Recitation
+  Type: Lapel Pin & Badge
+  Shapes (Multi-Tag): Shield & Crest, Star & Celestial
+  Materials (Multi-Tag): Solid Brass & Gold, Acrylic Glass
+  Themes (Multi-Tag): Spiritual & Sacred Heritage
+  Collections (Multi-Tag): Budget Champions
+  Size Variations:
+    - 3.5 cm Pin: 3.5x3.5x0.4 cm (0.03 kg) -> 1-100 pcs @ ₹290 | 101-500 pcs @ ₹210
+    - 5 cm Badge: 5x5x0.5 cm (0.05 kg) -> 1-100 pcs @ ₹460 | 101-500 pcs @ ₹340
+
+[PRODUCT 35] SKU: ATW-SPT-035
+  Name: Corporate Golf Open Eagle Championship Trophy
+  Category: Sports Trophies | Subcategory: Golf
+  Type: Metal Trophy
+  Shapes (Multi-Tag): Grand Cup, Obelisk Tower
+  Materials (Multi-Tag): Solid Brass & Gold, Optical Crystal
+  Themes (Multi-Tag): Sports & Athletics, Corporate Milestone
+  Collections (Multi-Tag): Presidential Series, Tournament Edition, best-sellers
+  Size Variations:
+    - 16" Eagle Cup: 16x13x40 cm (3.1 kg) -> 1-5 pcs @ ₹18,900 | 6-20 pcs @ ₹16,200
+
+[PRODUCT 36] SKU: ATW-COR-036
+  Name: Star Performer Quarterly MVP Crystal Pillar
+  Category: Corporate Awards | Subcategory: Star Performer
+  Type: Crystal Plaque
+  Shapes (Multi-Tag): Obelisk Tower, Flame & Diamond
+  Materials (Multi-Tag): Optical Crystal, Stainless Steel
+  Themes (Multi-Tag): Corporate Milestone, Victory & Triumph
+  Collections (Multi-Tag): Presidential Series, best-sellers, featured
+  Size Variations:
+    - 10" Pillar: 10x8x25 cm (1.6 kg) -> 1-10 pcs @ ₹7,200 | 11-50 pcs @ ₹6,100
+
+[PRODUCT 37] SKU: ATW-ACA-037
+  Name: National Spelling Bee Championship Star
+  Category: Academic Excellence | Subcategory: Debate Champion
+  Type: Acrylic Star
+  Shapes (Multi-Tag): Star & Celestial, Shield & Crest
+  Materials (Multi-Tag): Acrylic Glass, Optical Crystal
+  Themes (Multi-Tag): Academic & Knowledge
+  Collections (Multi-Tag): Budget Champions, Tournament Edition
+  Size Variations:
+    - 8" Star: 8x6x20 cm (0.7 kg) -> 1-15 pcs @ ₹2,200 | 16-50 pcs @ ₹1,750
+
+[PRODUCT 38] SKU: ATW-REL-038
+  Name: Classical Sangeet Gurukul Honor Plaque
+  Category: Religious & Cultural | Subcategory: Scholarly & Scriptural Recitation
+  Type: Crystal Plaque
+  Shapes (Multi-Tag): Obelisk Tower, Shield & Crest
+  Materials (Multi-Tag): Optical Crystal, Teak Hardwood
+  Themes (Multi-Tag): Spiritual & Sacred Heritage, Academic & Knowledge
+  Collections (Multi-Tag): Heritage Craftsmanship, Presidential Series
+  Size Variations:
+    - 11" Plaque: 12x10x28 cm (1.8 kg) -> 1-10 pcs @ ₹6,500 | 11-40 pcs @ ₹5,400
+
+[PRODUCT 39] SKU: ATW-SPT-039
+  Name: All-India Badminton Championship Shield
+  Category: Sports Trophies | Subcategory: Badminton
+  Type: Wooden Shield
+  Shapes (Multi-Tag): Shield & Crest, Star & Celestial
+  Materials (Multi-Tag): Teak Hardwood, Solid Brass & Gold
+  Themes (Multi-Tag): Sports & Athletics, Victory & Triumph
+  Collections (Multi-Tag): Heritage Craftsmanship, Tournament Edition
+  Size Variations:
+    - 10" Shield: 18x14x25 cm (1.4 kg) -> 1-10 pcs @ ₹3,800 | 11-50 pcs @ ₹3,100
+
+[PRODUCT 40] SKU: ATW-COR-040
+  Name: Executive Board Chairman Milestone Monument
+  Category: Corporate Awards | Subcategory: Leadership Excellence
+  Type: Metal Trophy
+  Shapes (Multi-Tag): Obelisk Tower, Flame & Diamond, Grand Cup
+  Materials (Multi-Tag): Solid Brass & Gold, Optical Crystal, Teak Hardwood
+  Themes (Multi-Tag): Leadership & Excellence, Corporate Milestone, Victory & Triumph
+  Collections (Multi-Tag): Presidential Series, featured, best-sellers
+  Size Variations:
+    - Presidential Edition (18"): 18x14x46 cm (4.5 kg) -> 1-3 pcs @ ₹28,000 | 4-10 pcs @ ₹24,500
+========================================================================================

@@ -40,14 +40,30 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              (function() {
+                try {
+                  var stored = localStorage.getItem('theme');
+                  if (stored === 'light') {
+                    document.documentElement.classList.remove('dark');
+                  } else if (stored === 'dark') {
+                    document.documentElement.classList.add('dark');
+                  }
+                } catch (e) {}
+              })();
+            `,
+          }}
+        />
         <link
           href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap"
           rel="stylesheet"
         />
       </head>
-      <body className="min-h-full flex flex-col bg-black text-[#e5e2e1] font-sans selection:bg-[#f2ca50]/30 selection:text-[#f2ca50]">
+      <body className="min-h-full flex flex-col bg-background text-foreground font-sans transition-colors duration-300 selection:bg-primary/30 selection:text-primary">
         {children}
-        <Toaster position="top-right" richColors theme="dark" />
+        <Toaster position="top-right" richColors closeButton />
       </body>
     </html>
   );

@@ -19,25 +19,24 @@
   --font-mono: var(--font-mono, monospace);
   --font-heading: var(--font-heading, "Libre Caslon Text", serif);
 
-  /* Stitch Atelier Première Brand Colors */
-  --color-brand-gold: #f2ca50;
-  --color-brand-gold-dark: #d4af37;
-  --color-brand-blue: #2563eb;
-  --color-brand-blue-hover: #1d4ed8;
-  --color-brand-dark: #000000;
-  --color-brand-surface-dim: #131313;
-  --color-brand-surface-bright: #3a3939;
+  /* Dynamic Stitch Atelier Brand & Surface Tokens */
+  --color-brand-gold: var(--gold);
+  --color-brand-gold-dark: var(--gold-hover);
+  --color-brand-blue: var(--navy);
+  --color-brand-dark: var(--bg-dark);
+  --color-brand-surface-dim: var(--card);
+  --color-brand-surface-bright: var(--muted);
 
-  /* Stitch AURA Catalog Colors */
-  --color-surface: #131313;
-  --color-surface-dim: #131313;
-  --color-surface-bright: #3a3939;
-  --color-surface-container: #201f1f;
-  --color-surface-container-lowest: #0e0e0e;
-  --color-on-surface: #e5e2e1;
-  --color-on-surface-variant: #d0c5af;
-  --color-outline-variant: #4d4635;
-  --color-primary-container: #d4af37;
+  /* Dynamic Stitch AURA Catalog Tokens */
+  --color-surface: var(--card);
+  --color-surface-dim: var(--background);
+  --color-surface-bright: var(--muted);
+  --color-surface-container: var(--card);
+  --color-surface-container-lowest: var(--background);
+  --color-on-surface: var(--foreground);
+  --color-on-surface-variant: var(--muted-foreground);
+  --color-outline-variant: var(--border);
+  --color-primary-container: var(--gold-hover);
 
   /* Brand Theme Custom Color Tokens & Dynamic Overrides */
   --color-gold: var(--gold);
@@ -82,15 +81,64 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+
+  /* 9-Tier Responsive Architecture Custom Breakpoint Tokens */
+  --breakpoint-xs: 320px;
+  --breakpoint-mobile-mid: 360px;
+  --breakpoint-mobile-lg: 375px;
+  --breakpoint-phablet: 430px;
+  --breakpoint-sm: 640px;
+  --breakpoint-md: 768px;
+  --breakpoint-lg: 1024px;
+  --breakpoint-xl: 1280px;
+  --breakpoint-2xl: 1536px;
 }
 
 /* ==============================================================================
    🎨 MASTER COLOR PALETTE — CENTRALIZED VARIABLES
    ============================================================================== */
-:root, .dark {
-  --gold: #f2ca50;
-  --gold-hover: #d4af37;
-  --navy: #2563eb;
+/* Light Mode (:root - Centralized Public Palette) */
+:root {
+  --gold: #ac4bff;
+  --gold-hover: #9835ec;
+  --navy: #ac4bff;
+  --obsidian: #FFFFFF;
+  --bg-dark: #F4F5F8;
+
+  --background: #F4F5F8;
+  --foreground: #1F1F1F;
+  --card: #FFFFFF;
+  --card-foreground: #1F1F1F;
+  --popover: #FFFFFF;
+  --popover-foreground: #1F1F1F;
+  --primary: #ac4bff;
+  --primary-foreground: #FFFFFF;
+  --secondary: #EFF1F5;
+  --secondary-foreground: #1F1F1F;
+  --muted: #F1F5F9;
+  --muted-foreground: #64748B;
+  --accent: #ac4bff;
+  --accent-foreground: #FFFFFF;
+  --destructive: #EF4444;
+  --border: #E2E8F0;
+  --input: #E2E8F0;
+  --ring: #ac4bff;
+  --radius: 0.625rem;
+  --sidebar: #700895;
+  --sidebar-foreground: #FFFFFF;
+  --sidebar-primary: #ac4bff;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #5B0679;
+  --sidebar-accent-foreground: #FFFFFF;
+  --sidebar-border: rgba(255, 255, 255, 0.15);
+  --sidebar-ring: #ac4bff;
+}
+
+/* Dark Mode (.dark - Executive Obsidian & Amber Gold) */
+.dark {
+  --gold: #eb9425;
+  --gold-hover: #d68014;
+  --navy: #eb9425;
   --obsidian: #131313;
   --bg-dark: #000000;
 
@@ -100,63 +148,106 @@
   --card-foreground: #e5e2e1;
   --popover: #131313;
   --popover-foreground: #e5e2e1;
-  --primary: #f2ca50;
-  --primary-foreground: #000000;
+  --primary: #eb9425;
+  --primary-foreground: #FFFFFF;
   --secondary: #201f1f;
   --secondary-foreground: #e5e2e1;
   --muted: #201f1f;
   --muted-foreground: #d0c5af;
-  --accent: #201f1f;
-  --accent-foreground: #e5e2e1;
+  --accent: #eb9425;
+  --accent-foreground: #FFFFFF;
   --destructive: #F87171;
   --border: #4d4635;
   --input: #3a3939;
-  --ring: #f2ca50;
+  --ring: #eb9425;
   --radius: 0.625rem;
   --sidebar: #131313;
   --sidebar-foreground: #e5e2e1;
-  --sidebar-primary: #f2ca50;
+  --sidebar-primary: #eb9425;
   --sidebar-primary-foreground: #000000;
   --sidebar-accent: #201f1f;
   --sidebar-accent-foreground: #e5e2e1;
   --sidebar-border: #3a3939;
-  --sidebar-ring: #f2ca50;
+  --sidebar-ring: #eb9425;
 }
+
+
 
 /* ==============================================================================
-   ✨ STITCH PREMIÈRE GLASSMORPHISM & UTILITY CLASSES
+   ✨ CENTRALIZED PUBLIC SITE BUTTON CONTROL SYSTEM (GROUP 1 & GROUP 2)
    ============================================================================== */
-.premium-glass {
-  background: rgba(255, 255, 255, 0.03);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
-}
 
+/* Group 1 Button (.btn-group-1, .btn-primary) */
+/* Light Theme: #ac4bff background + white text */
+/* Dark Theme:  #eb9425 background + white text */
+.btn-group-1,
 .btn-primary {
-  background: #2563eb;
-  color: #ffffff;
-  border: 1px solid rgba(37, 99, 235, 0.5);
-  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+  background-color: #ac4bff !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(172, 75, 255, 0.4);
+  box-shadow: 0 4px 14px rgba(172, 75, 255, 0.25);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+.btn-group-1:hover,
 .btn-primary:hover {
-  background: #1d4ed8;
-  box-shadow: 0 4px 16px rgba(37, 99, 235, 0.3);
+  background-color: #9835ec !important;
+  border-color: rgba(152, 53, 236, 0.6);
+  box-shadow: 0 6px 20px rgba(172, 75, 255, 0.4);
   transform: translateY(-1px);
 }
 
+.dark .btn-group-1,
+.dark .btn-primary {
+  background-color: #eb9425 !important;
+  color: #ffffff !important;
+  border: 1px solid rgba(235, 148, 37, 0.4);
+  box-shadow: 0 4px 14px rgba(235, 148, 37, 0.25);
+}
+
+.dark .btn-group-1:hover,
+.dark .btn-primary:hover {
+  background-color: #d68014 !important;
+  border-color: rgba(214, 128, 20, 0.6);
+  box-shadow: 0 6px 20px rgba(235, 148, 37, 0.4);
+  transform: translateY(-1px);
+}
+
+/* Group 2 Button (.btn-group-2, .btn-secondary-glass) */
+/* Constant Background: Transparent with 12px Backdrop Blur */
+/* Light Theme: Black text + subtle dark border */
+/* Dark Theme:  White text + subtle light border */
+.btn-group-2,
 .btn-secondary-glass {
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  color: #e5e2e1;
-  backdrop-filter: blur(12px);
+  background-color: rgba(0, 0, 0, 0.03) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.15) !important;
+  color: #0F172A !important;
   transition: all 0.3s ease;
 }
+
+.btn-group-2:hover,
 .btn-secondary-glass:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(255, 255, 255, 0.15);
+  background-color: rgba(0, 0, 0, 0.08) !important;
+  border-color: rgba(0, 0, 0, 0.28) !important;
+  transform: translateY(-1px);
+}
+
+.dark .btn-group-2,
+.dark .btn-secondary-glass {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  backdrop-filter: blur(12px) !important;
+  -webkit-backdrop-filter: blur(12px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.18) !important;
+  color: #ffffff !important;
+}
+
+.dark .btn-group-2:hover,
+.dark .btn-secondary-glass:hover {
+  background-color: rgba(255, 255, 255, 0.12) !important;
+  border-color: rgba(255, 255, 255, 0.35) !important;
+  transform: translateY(-1px);
 }
 
 .btn-gold {
@@ -165,51 +256,92 @@
   border: 1px solid #f2ca50;
   transition: all 0.3s ease;
 }
+
 .btn-gold:hover {
   background: #d4af37;
   border-color: #d4af37;
 }
 
-.section-padding { 
-  padding-top: 3.5rem; 
-  padding-bottom: 3.5rem; 
+.section-padding {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
 }
-@media (min-width: 768px) {
-  .section-padding { 
-    padding-top: 5rem; 
-    padding-bottom: 5rem; 
-  }
-}
-@media (min-width: 1024px) {
-  .section-padding { 
-    padding-top: 7.5rem; 
-    padding-bottom: 7.5rem; 
+
+@media (min-width: 360px) {
+  .section-padding {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
   }
 }
 
-.container-custom { 
-  max-width: 1440px; 
-  margin-left: auto; 
-  margin-right: auto;
-  padding-left: 1rem; 
-  padding-right: 1rem; 
-}
-@media (min-width: 640px) {
-  .container-custom { 
-    padding-left: 1.5rem; 
-    padding-right: 1.5rem; 
+@media (min-width: 430px) {
+  .section-padding {
+    padding-top: 3.5rem;
+    padding-bottom: 3.5rem;
   }
 }
+
+@media (min-width: 768px) {
+  .section-padding {
+    padding-top: 5rem;
+    padding-bottom: 5rem;
+  }
+}
+
 @media (min-width: 1024px) {
-  .container-custom { 
-    padding-left: 2.5rem; 
-    padding-right: 2.5rem; 
+  .section-padding {
+    padding-top: 7.5rem;
+    padding-bottom: 7.5rem;
   }
 }
+
+.container-custom {
+  max-width: 1440px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 0.625rem;
+  padding-right: 0.625rem;
+}
+
+@media (min-width: 360px) {
+  .container-custom {
+    padding-left: 0.875rem;
+    padding-right: 0.875rem;
+  }
+}
+
+@media (min-width: 375px) {
+  .container-custom {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+@media (min-width: 430px) {
+  .container-custom {
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
+@media (min-width: 640px) {
+  .container-custom {
+    padding-left: 1.5rem;
+    padding-right: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .container-custom {
+    padding-left: 2.5rem;
+    padding-right: 2.5rem;
+  }
+}
+
 @media (min-width: 1280px) {
-  .container-custom { 
-    padding-left: 4rem; 
-    padding-right: 4rem; 
+  .container-custom {
+    padding-left: 4rem;
+    padding-right: 4rem;
   }
 }
 
@@ -225,13 +357,19 @@
   }
 
   body {
-    background-color: #000000;
-    color: #e5e2e1;
+    background-color: var(--background);
+    color: var(--foreground);
     font-family: var(--font-sans);
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  h1, h2, h3, h4, .font-serif {
+  h1,
+  h2,
+  h3,
+  h4,
+  .font-serif {
     font-family: var(--font-heading);
   }
 }
+

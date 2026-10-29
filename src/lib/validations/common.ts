@@ -4,11 +4,11 @@ import { z } from "zod";
  * Common pagination and query params schema for list endpoints.
  */
 export const paginationQuerySchema = z.object({
-  page: z.coerce.number().int().min(1).default(1),
-  limit: z.coerce.number().int().min(1).max(100).default(10),
-  search: z.string().trim().optional(),
-  sortBy: z.string().trim().optional(),
-  sortOrder: z.enum(["asc", "desc"]).default("desc"),
+  page: z.preprocess((val) => (val === null || val === '' ? undefined : val), z.coerce.number().int().min(1).default(1)),
+  limit: z.preprocess((val) => (val === null || val === '' ? undefined : val), z.coerce.number().int().min(1).max(100).default(10)),
+  search: z.preprocess((val) => (val === null || val === '' ? undefined : val), z.string().trim().optional()),
+  sortBy: z.preprocess((val) => (val === null || val === '' ? undefined : val), z.string().trim().optional()),
+  sortOrder: z.preprocess((val) => (val === null || val === '' ? undefined : val), z.enum(["asc", "desc"]).default("desc")),
 });
 
 /**

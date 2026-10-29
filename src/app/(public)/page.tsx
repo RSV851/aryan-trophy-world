@@ -1,219 +1,137 @@
 import React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { SmartImage } from '@/components/ui/smart-image';
+import { Trophy } from 'lucide-react';
 import { getPublicProducts, getPublicOwnerProfile, getPublicSettingsMap } from '@/lib/data/public-catalog';
 
-export const revalidate = 60; // SSR refresh interval
+export const revalidate = 0; // Dynamic 0-second revalidation for instant homepage updates
 
 export default async function HomePage() {
-  const [featuredProducts, profile, settings] = await Promise.all([
-    getPublicProducts({ isFeatured: true, limit: 8 }),
+  const [featuredCollectionRes, bestsellerCollectionRes, profile, settings] = await Promise.all([
+    getPublicProducts({ collectionSlug: 'featured', limit: 8 }),
+    getPublicProducts({ collectionSlug: 'best-sellers', limit: 8 }),
     getPublicOwnerProfile(),
     getPublicSettingsMap(),
   ]);
 
   const phone = profile?.phone || settings?.contact_phone || '+91 98765 43210';
+  const heroBanner = settings?.hero_banner_image || '';
+  const heroHeadline = settings?.hero_headline || 'Every trophy tells a story worth engraving.';
+  const heroSubtitle = settings?.hero_subtitle || 'Complimentary custom engraving on every award. Handcrafted for tournaments, corporate honors, and champions.';
 
-  // 8 Bestsellers using the user's uploaded local trophy assets in /images/trophies/
-  const defaultBestsellers = [
-    {
-      id: 'default-1',
-      slug: 'champion-gold-cup',
-      name: 'Champion Gold Cup',
-      sku: 'AT-C01',
-      priceRange: '₹18,499 ($249)',
-      categoryName: 'Polished Metal & Mahogany',
-      imageUrl: '/images/trophies/gold-cup.jpg',
-    },
-    {
-      id: 'default-2',
-      slug: 'golden-foot-award',
-      name: 'Golden Foot Sports Award',
-      sku: 'AT-S02',
-      priceRange: '₹9,499 ($125)',
-      categoryName: 'Professional Sports Series',
-      imageUrl: '/images/trophies/golden-foot.jpg',
-    },
-    {
-      id: 'default-3',
-      slug: 'crystal-pinnacle',
-      name: 'Crystal Pinnacle Star',
-      sku: 'AT-CP03',
-      priceRange: '₹22,999 ($310)',
-      categoryName: 'Optical K9 Crystal',
-      imageUrl: '/images/trophies/crystal-star.jpg',
-    },
-    {
-      id: 'default-4',
-      slug: 'radiant-shield',
-      name: 'Radiant Victory Shield',
-      sku: 'AT-RS04',
-      priceRange: '₹14,299 ($189)',
-      categoryName: 'Traditional Team Honors',
-      imageUrl: '/images/trophies/victory-shield.jpg',
-    },
-    {
-      id: 'default-5',
-      slug: 'gold-star-trophy',
-      name: 'Leadership Gold Star Trophy',
-      sku: 'AT-GS05',
-      priceRange: '₹12,999 ($165)',
-      categoryName: 'Executive Excellence',
-      imageUrl: '/images/trophies/gold-star.jpg',
-    },
-    {
-      id: 'default-6',
-      slug: 'olympic-victory-medal',
-      name: 'Olympic Championship Medal',
-      sku: 'AT-M06',
-      priceRange: '₹4,999 ($65)',
-      categoryName: 'Solid Brass & Cast Gold',
-      imageUrl: '/images/trophies/victory-medal.jpg',
-    },
-    {
-      id: 'default-7',
-      slug: 'corporate-glass-plaque',
-      name: 'Corporate Glass Plaque',
-      sku: 'AT-GP07',
-      priceRange: '₹16,499 ($215)',
-      categoryName: 'Laser-Engraved Crystal',
-      imageUrl: '/images/trophies/glass-plaque.jpg',
-    },
-    {
-      id: 'default-8',
-      slug: 'mahogany-honor-wooden',
-      name: 'Mahogany Honor Plaque',
-      sku: 'AT-MP08',
-      priceRange: '₹11,499 ($149)',
-      categoryName: 'Rosewood & Brass Casing',
-      imageUrl: '/images/trophies/mahogany-plaque.jpg',
-    },
+  const featuredProducts = (featuredCollectionRes?.products || []).slice(0, 8);
+  const displayProducts = (bestsellerCollectionRes?.products || []).slice(0, 8);
+
+  const curatedCards = [
+    { id: 1, title: settings?.curated_card_1_title || 'Sports Awards', image: settings?.curated_card_1_image || '', link: settings?.curated_card_1_link || '/catalog?categorySlug=sports-trophies' },
+    { id: 2, title: settings?.curated_card_2_title || 'Corporate Awards', image: settings?.curated_card_2_image || '', link: settings?.curated_card_2_link || '/catalog?categorySlug=corporate-awards' },
+    { id: 3, title: settings?.curated_card_3_title || 'Academic Honors', image: settings?.curated_card_3_image || '', link: settings?.curated_card_3_link || '/catalog?categorySlug=academic-excellence' },
+    { id: 4, title: settings?.curated_card_4_title || 'Crystal Monuments', image: settings?.curated_card_4_image || '', link: settings?.curated_card_4_link || '/catalog?materialSlug=crystal' },
+    { id: 5, title: settings?.curated_card_5_title || 'Victory Medals', image: settings?.curated_card_5_image || '', link: settings?.curated_card_5_link || '/catalog?typeSlug=medal' },
+    { id: 6, title: settings?.curated_card_6_title || 'Bespoke Plaques', image: settings?.curated_card_6_image || '', link: settings?.curated_card_6_link || '/catalog?typeSlug=plaque' },
   ];
 
-  const dbProducts = (featuredProducts?.products || []).map((prod, index) => {
-    // If DB product uses an external URL, map it to local user trophy image
-    const fallbackLocalImages = [
-      '/images/trophies/gold-cup.jpg',
-      '/images/trophies/golden-foot.jpg',
-      '/images/trophies/crystal-star.jpg',
-      '/images/trophies/victory-shield.jpg',
-      '/images/trophies/gold-star.jpg',
-      '/images/trophies/victory-medal.jpg',
-      '/images/trophies/glass-plaque.jpg',
-      '/images/trophies/mahogany-plaque.jpg',
-    ];
-    const originalImg = prod.imageUrl || prod.images?.[0]?.imageUrl;
-    const isExternal = !originalImg || originalImg.startsWith('http');
-    return {
-      ...prod,
-      imageUrl: isExternal ? fallbackLocalImages[index % fallbackLocalImages.length] : originalImg,
-    };
-  });
-
-  const displayProducts = dbProducts.length >= 8 
-    ? dbProducts.slice(0, 8) 
-    : [...dbProducts, ...defaultBestsellers.slice(dbProducts.length, 8)];
-
   return (
-    <div className="w-full bg-black text-[#e5e2e1]">
+    <div className="w-full bg-background text-foreground transition-colors duration-300">
       
-      {/* BEGIN: HeroSection with Local Banner Image */}
-      <section className="relative h-[55vh] sm:h-[60vh] md:h-[65vh] flex items-center overflow-hidden py-6 md:py-0" data-purpose="hero-banner">
+      {/* BEGIN: HeroSection with Dynamic DB Banner Image & Headline */}
+      <section className="relative min-h-[480px] sm:min-h-[540px] md:min-h-[580px] h-auto sm:h-[60vh] md:h-[65vh] flex items-center overflow-hidden py-8 mobile-mid:py-10 sm:py-12 md:py-0 bg-card border-b border-border" data-purpose="hero-banner">
         <div className="absolute inset-0 z-0">
-          <Image
-            alt="Real Gold Championship Trophy"
-            src="/images/trophies/hero-banner.jpg"
-            fill
-            priority
-            className="object-cover object-center"
+          <SmartImage
+            alt="Hero Banner"
+            src={heroBanner}
+            className="w-full h-full"
+            imgClassName="w-full h-full object-cover object-center"
+            fallbackIcon={<div className="w-full h-full bg-gradient-to-br from-background via-card to-background opacity-80" />}
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-black/80 via-black/50 to-black/95" />
+          <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/50 to-background/95" />
         </div>
         
-        <div className="container-custom relative z-10 text-center w-full">
-          <p className="text-[#f2ca50] font-sans font-semibold uppercase tracking-[0.25em] sm:tracking-[0.3em] text-[10px] sm:text-xs mb-3 sm:mb-4">
+        <div className="container-custom relative z-10 text-center w-full my-auto py-4">
+          <p className="text-primary font-sans font-semibold uppercase tracking-[0.2em] mobile-mid:tracking-[0.25em] sm:tracking-[0.3em] text-[9px] mobile-mid:text-[10px] sm:text-xs mb-2 mobile-mid:mb-3 sm:mb-4">
             Exclusive Engraving & Bespoke Crafting
           </p>
           
-          {/* Responsive Banner Headline */}
-          <h1 className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-light mb-4 md:mb-6 leading-[1.15] text-white tracking-tight max-w-4xl mx-auto">
-            Every trophy tells a <br className="hidden sm:inline" />
-            <span className="italic font-normal text-[#f2ca50]">story worth engraving.</span>
+          {/* Dynamic Hero Headline */}
+          <h1 className="text-2xl mobile-mid:text-3xl mobile-lg:text-4xl phablet:text-5xl sm:text-5xl md:text-6xl lg:text-7xl font-display font-light mb-3 mobile-mid:mb-4 md:mb-6 leading-[1.15] text-foreground tracking-tight max-w-4xl mx-auto">
+            {heroHeadline}
           </h1>
           
-          <p className="text-xs sm:text-sm md:text-base font-sans text-white/70 max-w-xl mx-auto mb-6 sm:mb-8 leading-relaxed px-2">
-            Complimentary custom engraving on every award. Handcrafted for tournaments, corporate honors, and champions.
+          {/* Dynamic Hero Subtitle */}
+          <p className="text-[11px] mobile-mid:text-xs mobile-lg:text-xs phablet:text-sm sm:text-sm md:text-base font-sans text-muted-foreground max-w-xl mx-auto mb-4 mobile-mid:mb-6 sm:mb-8 leading-relaxed px-1 mobile-mid:px-2">
+            {heroSubtitle}
           </p>
           
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 max-w-md mx-auto sm:max-w-none">
-            <Link href="/catalog" className="btn-primary w-full sm:w-auto px-8 sm:px-10 py-3 font-semibold rounded-full uppercase tracking-widest text-[10px] sm:text-[11px] text-center">
+          <div className="flex flex-col mobile-lg:flex-row items-center justify-center gap-2.5 mobile-mid:gap-3 sm:gap-4 max-w-md mx-auto sm:max-w-none">
+            <Link href="/catalog" className="btn-primary w-full mobile-lg:w-auto px-6 mobile-mid:px-8 sm:px-10 py-2.5 mobile-mid:py-3 font-semibold rounded-full uppercase tracking-widest text-[10px] sm:text-[11px] text-center">
               Browse Collection
             </Link>
-            <Link href="/contact" className="btn-secondary-glass w-full sm:w-auto px-8 sm:px-10 py-3 font-semibold rounded-full uppercase tracking-widest text-[10px] sm:text-[11px] text-center">
+            <Link href="/contact" className="btn-secondary-glass w-full mobile-lg:w-auto px-6 mobile-mid:px-8 sm:px-10 py-2.5 mobile-mid:py-3 font-semibold rounded-full uppercase tracking-widest text-[10px] sm:text-[11px] text-center border border-border bg-card text-foreground hover:bg-muted">
               Send Inquiry
             </Link>
           </div>
 
-          <div className="mt-8 sm:mt-10 flex flex-wrap items-center justify-center gap-4 sm:gap-8 text-[9px] sm:text-[10px] text-white/50 font-semibold uppercase tracking-[0.2em]">
-            <span className="flex items-center gap-1.5"><span className="text-[#f2ca50]">★</span> 200+ Reviews</span>
-            <span className="flex items-center gap-1.5"><span className="text-[#f2ca50]">★</span> 15+ Years Exp</span>
-            <span className="flex items-center gap-1.5"><span className="text-[#f2ca50]">★</span> 2000+ Projects</span>
+          <div className="mt-5 mobile-mid:mt-6 sm:mt-8 pb-4 sm:pb-6 flex flex-wrap items-center justify-center gap-2.5 mobile-mid:gap-4 sm:gap-8 text-[8px] mobile-mid:text-[9px] sm:text-[10px] text-muted-foreground font-semibold uppercase tracking-[0.15em] mobile-mid:tracking-[0.2em]">
+            <span className="flex items-center gap-1"><span className="text-primary">★</span> 200+ Reviews</span>
+            <span className="flex items-center gap-1"><span className="text-primary">★</span> 15+ Years Exp</span>
+            <span className="flex items-center gap-1"><span className="text-primary">★</span> 2000+ Projects</span>
           </div>
         </div>
 
-        {/* Scroll Down Hint Indicator */}
-        <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-0.5 text-white/50 text-[9px] uppercase tracking-[0.2em] pointer-events-none">
+        {/* Scroll Down Hint Indicator (Hidden on small mobile where height is tight, visible on sm: 640px+) */}
+        <div className="absolute bottom-2 sm:bottom-3 left-1/2 -translate-x-1/2 z-20 hidden sm:flex flex-col items-center gap-0.5 text-muted-foreground text-[8px] mobile-mid:text-[9px] uppercase tracking-[0.2em] pointer-events-none">
           <span>Scroll to explore</span>
-          <span className="material-symbols-outlined text-base animate-bounce text-[#f2ca50]">keyboard_arrow_down</span>
+          <span className="material-symbols-outlined text-sm mobile-mid:text-base animate-bounce text-primary">keyboard_arrow_down</span>
         </div>
       </section>
       {/* END: HeroSection */}
 
       {/* BEGIN: OccasionCategories */}
-      <section className="section-padding bg-black" data-purpose="categories-grid">
+      <section className="section-padding bg-background" data-purpose="categories-grid">
         <div className="container-custom">
-          <div className="text-center mb-12 sm:mb-16">
-            <p className="text-[#f2ca50] uppercase tracking-[0.2em] text-[10px] font-semibold mb-3">Our Collections</p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-light text-white">A trophy for every occasion.</h2>
-            <p className="text-white/50 mt-4 max-w-xl mx-auto text-xs sm:text-sm leading-relaxed">
+          <div className="text-center mb-8 mobile-mid:mb-12 sm:mb-16">
+            <p className="text-primary uppercase tracking-[0.2em] text-[9px] mobile-mid:text-[10px] font-semibold mb-2 mobile-mid:mb-3">Our Collections</p>
+            <h2 className="text-2xl mobile-mid:text-3xl sm:text-4xl md:text-5xl font-display font-light text-foreground">A trophy for every occasion.</h2>
+            <p className="text-muted-foreground mt-3 mobile-mid:mt-4 max-w-xl mx-auto text-xs sm:text-sm leading-relaxed">
               Explore our curated ranges meticulously designed for sports tournaments, corporate galas, and scholastic honors.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div className="grid grid-cols-1 phablet:grid-cols-2 lg:grid-cols-3 gap-4 mobile-mid:gap-6 sm:gap-8">
             
             {/* Category Card 1 */}
-            <Link href="/catalog?category=Sports" className="premium-glass p-8 sm:p-10 rounded-2xl group cursor-pointer transition-all duration-500 hover:-translate-y-1 block">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#f2ca50]/10 border border-[#f2ca50]/20 rounded-xl flex items-center justify-center mb-6 sm:mb-8 text-[#f2ca50] group-hover:bg-[#2563eb] group-hover:text-white group-hover:border-[#2563eb] transition-all">
+            <Link href="/catalog?category=Sports" className="bg-card border border-border p-8 sm:p-10 rounded-2xl group cursor-pointer transition-all duration-500 hover:-translate-y-1 block shadow-sm hover:shadow-md">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center mb-6 sm:mb-8 text-primary group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
                 <span className="material-symbols-outlined text-2xl">emoji_events</span>
               </div>
-              <h3 className="text-xl sm:text-2xl font-display font-light text-white mb-3">Sports Awards</h3>
-              <p className="text-white/40 text-xs sm:text-sm mb-6 sm:mb-8 leading-relaxed">Cups, tournament medals & champion trophies designed for athletes.</p>
-              <span className="text-xs font-semibold text-[#f2ca50] uppercase tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all">
+              <h3 className="text-xl sm:text-2xl font-display font-light text-foreground mb-3">Sports Awards</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm mb-6 sm:mb-8 leading-relaxed">Cups, tournament medals & champion trophies designed for athletes.</p>
+              <span className="text-xs font-semibold text-primary uppercase tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all">
                 Explore <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </span>
             </Link>
 
             {/* Category Card 2 */}
-            <Link href="/catalog?category=Corporate" className="premium-glass p-8 sm:p-10 rounded-2xl group cursor-pointer transition-all duration-500 hover:-translate-y-1 block">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#f2ca50]/10 border border-[#f2ca50]/20 rounded-xl flex items-center justify-center mb-6 sm:mb-8 text-[#f2ca50] group-hover:bg-[#2563eb] group-hover:text-white group-hover:border-[#2563eb] transition-all">
+            <Link href="/catalog?category=Corporate" className="bg-card border border-border p-8 sm:p-10 rounded-2xl group cursor-pointer transition-all duration-500 hover:-translate-y-1 block shadow-sm hover:shadow-md">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center mb-6 sm:mb-8 text-primary group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
                 <span className="material-symbols-outlined text-2xl">business_center</span>
               </div>
-              <h3 className="text-xl sm:text-2xl font-display font-light text-white mb-3">Corporate Awards</h3>
-              <p className="text-white/40 text-xs sm:text-sm mb-6 sm:mb-8 leading-relaxed">Crystal plaques & recognition gifts for enterprise excellence.</p>
-              <span className="text-xs font-semibold text-[#f2ca50] uppercase tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all">
+              <h3 className="text-xl sm:text-2xl font-display font-light text-foreground mb-3">Corporate Awards</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm mb-6 sm:mb-8 leading-relaxed">Crystal plaques & recognition gifts for enterprise excellence.</p>
+              <span className="text-xs font-semibold text-primary uppercase tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all">
                 Explore <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </span>
             </Link>
 
             {/* Category Card 3 */}
-            <Link href="/catalog?category=Academic" className="premium-glass p-8 sm:p-10 rounded-2xl group cursor-pointer transition-all duration-500 hover:-translate-y-1 block sm:col-span-2 lg:col-span-1">
-              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-[#f2ca50]/10 border border-[#f2ca50]/20 rounded-xl flex items-center justify-center mb-6 sm:mb-8 text-[#f2ca50] group-hover:bg-[#2563eb] group-hover:text-white group-hover:border-[#2563eb] transition-all">
+            <Link href="/catalog?category=Academic" className="bg-card border border-border p-8 sm:p-10 rounded-2xl group cursor-pointer transition-all duration-500 hover:-translate-y-1 block sm:col-span-2 lg:col-span-1 shadow-sm hover:shadow-md">
+              <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary/10 border border-primary/20 rounded-xl flex items-center justify-center mb-6 sm:mb-8 text-primary group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all">
                 <span className="material-symbols-outlined text-2xl">school</span>
               </div>
-              <h3 className="text-xl sm:text-2xl font-display font-light text-white mb-3">School Awards</h3>
-              <p className="text-white/40 text-xs sm:text-sm mb-6 sm:mb-8 leading-relaxed">Honoring academic excellence with custom laser engravings.</p>
-              <span className="text-xs font-semibold text-[#f2ca50] uppercase tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all">
+              <h3 className="text-xl sm:text-2xl font-display font-light text-foreground mb-3">School Awards</h3>
+              <p className="text-muted-foreground text-xs sm:text-sm mb-6 sm:mb-8 leading-relaxed">Honoring academic excellence with custom laser engravings.</p>
+              <span className="text-xs font-semibold text-primary uppercase tracking-widest flex items-center gap-2 group-hover:gap-4 transition-all">
                 Explore <span className="material-symbols-outlined text-sm">arrow_forward</span>
               </span>
             </Link>
@@ -223,49 +141,137 @@ export default async function HomePage() {
       </section>
       {/* END: OccasionCategories */}
 
-      {/* BEGIN: BestsellersProductGrid (8 Cards) */}
-      <section className="section-padding bg-[#0a0a0a]" data-purpose="product-grid">
+      {/* BEGIN: Featured Masterpieces Showcase Section */}
+      <section className="section-padding bg-card/40 border-y border-border" data-purpose="featured-products">
         <div className="container-custom">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-12 sm:mb-16 gap-4">
             <div>
-              <p className="text-[#f2ca50] uppercase tracking-[0.2em] text-[10px] font-semibold mb-3">Curated Selection</p>
-              <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-light text-white">Bestsellers this season.</h2>
+              <p className="text-primary uppercase tracking-[0.2em] text-[10px] font-semibold mb-3 flex items-center gap-1.5">
+                <span>★</span> <span>Featured Atelier Collection</span>
+              </p>
+              <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-light text-foreground">
+                Featured Masterpieces.
+              </h2>
             </div>
-            <Link href="/catalog" className="text-[#2563eb] text-[11px] font-bold uppercase tracking-widest border-b border-[#2563eb]/30 hover:border-[#2563eb] transition-all pb-1 self-start sm:self-auto">
-              View All Products ({displayProducts.length})
+            <Link href="/catalog?collection=featured" className="text-primary text-[11px] font-bold uppercase tracking-widest border-b border-primary/30 hover:border-primary transition-all pb-1 self-start sm:self-auto">
+              View Featured Collection ({featuredCollectionRes?.pagination?.total ?? featuredProducts.length})
+            </Link>
+          </div>
+
+          {featuredProducts.length === 0 ? (
+            <div className="col-span-full text-center py-16 px-6 bg-card border border-border rounded-2xl">
+              <p className="text-primary uppercase tracking-[0.2em] text-xs font-semibold mb-2">Featured Showroom</p>
+              <h3 className="text-xl font-display text-foreground mb-2">No Featured Products Currently Listed</h3>
+              <p className="text-muted-foreground text-sm max-w-md mx-auto mb-6">
+                Assign products to the 'Featured' collection in CMS to feature them here.
+              </p>
+              <Link href="/admin/products/create" className="btn-primary inline-block px-6 py-2.5 text-xs font-bold uppercase tracking-widest rounded-full">
+                Add Featured Product
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 phablet:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mobile-mid:gap-6 sm:gap-8">
+              {featuredProducts.map((prod: any, idx: number) => {
+                const img = prod.imageUrl || '/images/trophies/gold-cup.jpg';
+                const cat = prod.categoryName || prod.category?.name || 'Featured Collection';
+                const price = prod.priceRange || (prod.pricingMatrix?.[0]?.pricePerPiece ? `₹${prod.pricingMatrix[0].pricePerPiece}` : '$249');
+                // Strict Card Visibility: 2 on Mobile (<768px), 4 on Tabs (768px-1023px), 8 on Desktop (1024px+)
+                const visibilityClass = idx >= 4 ? 'hidden lg:flex' : idx >= 2 ? 'hidden md:flex' : 'flex';
+
+                return (
+                  <div key={prod.id} className={`${visibilityClass} bg-card rounded-2xl overflow-hidden group flex-col transition-all duration-300 hover:-translate-y-1 border border-border shadow-sm`}>
+                    <Link href={`/products/${prod.slug || prod.id}`} className="relative overflow-hidden aspect-[4/5] block bg-muted/40 w-full">
+                      <span className="absolute top-4 left-4 z-10 bg-primary text-white text-[9px] px-3 py-1 rounded-full uppercase font-black tracking-widest flex items-center gap-1 shadow-lg">
+                        <span>★</span> <span>Featured</span>
+                      </span>
+                      <SmartImage
+                        alt={prod.name}
+                        src={img}
+                        className="w-full h-full"
+                        imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                        fallbackIcon={<Trophy className="w-16 h-16 text-primary/50 stroke-[1.5]" />}
+                      />
+                    </Link>
+                    <div className="p-4 mobile-mid:p-6 flex-1 flex flex-col justify-between">
+                      <div>
+                        <Link href={`/products/${prod.slug || prod.id}`}>
+                          <h3 className="text-base mobile-mid:text-lg font-display text-foreground mb-2 hover:text-primary transition-colors">{prod.name}</h3>
+                        </Link>
+                        <p className="text-muted-foreground text-[10px] uppercase tracking-wider mb-4 mobile-mid:mb-6">{cat}</p>
+                      </div>
+                      <div className="flex items-center justify-between pt-3 mobile-mid:pt-4 border-t border-border">
+                        <span className="text-primary font-bold text-sm mobile-mid:text-base">{price}</span>
+                        <Link href={`/products/${prod.slug || prod.id}`} className="text-primary text-[10px] font-bold uppercase tracking-widest hover:text-foreground transition-colors">
+                          Inquiry
+                        </Link>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+      {/* END: Featured Masterpieces Showcase Section */}
+
+      {/* BEGIN: BestsellersProductGrid (8 Cards) */}
+      <section className="section-padding bg-background" data-purpose="product-grid">
+        <div className="container-custom">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8 mobile-mid:mb-12 sm:mb-16 gap-3 mobile-mid:gap-4">
+            <div>
+              <p className="text-primary uppercase tracking-[0.2em] text-[9px] mobile-mid:text-[10px] font-semibold mb-2 mobile-mid:mb-3">Curated Selection</p>
+              <h2 className="text-2xl mobile-mid:text-3xl sm:text-4xl md:text-5xl font-display font-light text-foreground">Bestsellers this season.</h2>
+            </div>
+            <Link href="/catalog" className="text-primary text-[10px] mobile-mid:text-[11px] font-bold uppercase tracking-widest border-b border-primary/30 hover:border-primary transition-all pb-1 self-start sm:self-auto">
+              View All Products ({bestsellerCollectionRes?.pagination?.total ?? displayProducts.length})
             </Link>
           </div>
           
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
-            {displayProducts.map((prod: any) => {
+          {displayProducts.length === 0 ? (
+            <div className="col-span-full text-center py-16 px-6 bg-card border border-border rounded-2xl">
+              <p className="text-primary uppercase tracking-[0.2em] text-xs font-semibold mb-2">Showroom Catalog</p>
+              <h3 className="text-xl font-display text-foreground mb-2">No Products Currently Listed</h3>
+              <p className="text-muted-foreground text-sm max-w-md mx-auto mb-6">
+                Our catalog database is currently being populated. Use the Executive CMS to add new trophies and awards.
+              </p>
+              <Link href="/admin/products/create" className="btn-primary inline-block px-6 py-2.5 text-xs font-bold uppercase tracking-widest rounded-full">
+                Add First Product
+              </Link>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 phablet:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 mobile-mid:gap-6 sm:gap-8">
+              {displayProducts.map((prod: any, idx: number) => {
               const img = prod.imageUrl || '/images/trophies/gold-cup.jpg';
               const cat = prod.categoryName || prod.category?.name || 'Prestige Collection';
               const price = prod.priceRange || (prod.pricingMatrix?.[0]?.pricePerPiece ? `₹${prod.pricingMatrix[0].pricePerPiece}` : '$249');
+              // Strict Card Visibility: 2 on Mobile (<768px), 4 on Tabs (768px-1023px), 8 on Desktop (1024px+)
+              const visibilityClass = idx >= 4 ? 'hidden lg:flex' : idx >= 2 ? 'hidden md:flex' : 'flex';
               
               return (
-                <div key={prod.id} className="premium-glass rounded-2xl overflow-hidden group flex flex-col transition-all duration-300 hover:-translate-y-1">
-                  <Link href={`/products/${prod.slug || prod.id}`} className="relative overflow-hidden aspect-[4/5] block bg-white/5">
-                    <span className="absolute top-4 left-4 z-10 bg-[#2563eb]/90 backdrop-blur-md text-white text-[9px] px-3 py-1 rounded-full uppercase font-bold tracking-widest">
+                <div key={prod.id} className={`${visibilityClass} bg-card rounded-2xl overflow-hidden group flex-col transition-all duration-300 hover:-translate-y-1 border border-border shadow-sm`}>
+                  <Link href={`/products/${prod.slug || prod.id}`} className="relative overflow-hidden aspect-[4/5] block bg-muted/40 w-full">
+                    <span className="absolute top-4 left-4 z-10 bg-primary/90 backdrop-blur-md text-white text-[9px] px-3 py-1 rounded-full uppercase font-bold tracking-widest">
                       In Stock
                     </span>
-                    <Image
+                    <SmartImage
                       alt={prod.name}
                       src={img}
-                      fill
-                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                      className="object-cover transition-transform duration-700 group-hover:scale-105"
+                      className="w-full h-full"
+                      imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                      fallbackIcon={<Trophy className="w-16 h-16 text-primary/50 stroke-[1.5]" />}
                     />
                   </Link>
-                  <div className="p-6 flex-1 flex flex-col justify-between">
+                  <div className="p-4 mobile-mid:p-6 flex-1 flex flex-col justify-between">
                     <div>
                       <Link href={`/products/${prod.slug || prod.id}`}>
-                        <h3 className="text-lg font-display text-white mb-2 hover:text-[#f2ca50] transition-colors">{prod.name}</h3>
+                        <h3 className="text-base mobile-mid:text-lg font-display text-foreground mb-2 hover:text-primary transition-colors">{prod.name}</h3>
                       </Link>
-                      <p className="text-white/40 text-[10px] uppercase tracking-wider mb-6">{cat}</p>
+                      <p className="text-muted-foreground text-[10px] uppercase tracking-wider mb-4 mobile-mid:mb-6">{cat}</p>
                     </div>
-                    <div className="flex items-center justify-between pt-4 border-t border-white/5">
-                      <span className="text-white font-semibold text-base">{price}</span>
-                      <Link href={`/products/${prod.slug || prod.id}`} className="text-[#f2ca50] text-[10px] font-bold uppercase tracking-widest hover:text-white transition-colors">
+                    <div className="flex items-center justify-between pt-3 mobile-mid:pt-4 border-t border-border">
+                      <span className="text-foreground font-semibold text-sm mobile-mid:text-base">{price}</span>
+                      <Link href={`/products/${prod.slug || prod.id}`} className="text-primary text-[10px] font-bold uppercase tracking-widest hover:text-foreground transition-colors">
                         Inquiry
                       </Link>
                     </div>
@@ -274,155 +280,79 @@ export default async function HomePage() {
               );
             })}
           </div>
+          )}
         </div>
       </section>
       {/* END: BestsellersProductGrid */}
 
       {/* BEGIN: CuratedRanges (Using User's Local Trophy Images) */}
-      <section className="section-padding bg-black" data-purpose="curated-ranges">
+      <section className="section-padding bg-background" data-purpose="curated-ranges">
         <div className="container-custom">
-          <div className="mb-12 sm:mb-16">
-            <p className="text-[#f2ca50] uppercase tracking-[0.2em] text-[10px] font-semibold mb-3">Shop by Category</p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-light text-white">Curated ranges.</h2>
+          <div className="mb-8 mobile-mid:mb-12 sm:mb-16">
+            <p className="text-primary uppercase tracking-[0.2em] text-[9px] mobile-mid:text-[10px] font-semibold mb-2 mobile-mid:mb-3">Shop by Category</p>
+            <h2 className="text-2xl mobile-mid:text-3xl sm:text-4xl md:text-5xl font-display font-light text-foreground">Curated ranges.</h2>
           </div>
-          
-          {/* Row 1 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <Link href="/catalog?category=Sports" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
-              <Image
-                alt="Sports Tournament Trophy"
-                src="/images/trophies/sports-trophy.jpg"
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 premium-glass border-t-0 rounded-b-2xl">
-                <h4 className="text-lg sm:text-xl font-display text-white">Sports Awards</h4>
-                <p className="text-[10px] text-white/50 uppercase tracking-widest mt-1">Cups, Medals & Tournaments</p>
-              </div>
-            </Link>
-
-            <Link href="/catalog?category=Corporate" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
-              <Image
-                alt="Corporate Crystal Award"
-                src="/images/trophies/corporate-award.jpg"
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 premium-glass border-t-0 rounded-b-2xl">
-                <h4 className="text-lg sm:text-xl font-display text-white">Corporate Awards</h4>
-                <p className="text-[10px] text-white/50 uppercase tracking-widest mt-1">Crystal & Executive Recognition</p>
-              </div>
-            </Link>
-
-            <Link href="/catalog?category=Academic" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
-              <Image
-                alt="Academic Winner Medal"
-                src="/images/trophies/academic-award.jpg"
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 premium-glass border-t-0 rounded-b-2xl">
-                <h4 className="text-lg sm:text-xl font-display text-white">Academic Awards</h4>
-                <p className="text-[10px] text-white/50 uppercase tracking-widest mt-1">Schools & Scholastic Events</p>
-              </div>
-            </Link>
-          </div>
-
-          {/* Row 2 */}
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <Link href="/catalog?material=Crystal" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
-              <Image
-                alt="Optical Crystal Glass Award"
-                src="/images/trophies/crystal-award.jpg"
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 premium-glass border-t-0 rounded-b-2xl">
-                <h4 className="text-lg sm:text-xl font-display text-white">Crystal Awards</h4>
-                <p className="text-[10px] text-white/50 uppercase tracking-widest mt-1">Premium Optical Glass</p>
-              </div>
-            </Link>
-
-            <Link href="/catalog?material=Wooden" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
-              <Image
-                alt="Wooden Trophy Plaque"
-                src="/images/trophies/wooden-award.jpg"
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 premium-glass border-t-0 rounded-b-2xl">
-                <h4 className="text-lg sm:text-xl font-display text-white">Wooden Awards</h4>
-                <p className="text-[10px] text-white/50 uppercase tracking-widest mt-1">Rosewood & Mahogany</p>
-              </div>
-            </Link>
-
-            <Link href="/catalog?material=Metal" className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-white/10 block">
-              <Image
-                alt="Metal Winner Medals"
-                src="/images/trophies/victory-medal.jpg"
-                fill
-                sizes="(max-width: 768px) 100vw, 33vw"
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
-              />
-              <div className="absolute inset-0 bg-black/40 group-hover:bg-black/20 transition-colors" />
-              <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 premium-glass border-t-0 rounded-b-2xl">
-                <h4 className="text-lg sm:text-xl font-display text-white">Metal Awards</h4>
-                <p className="text-[10px] text-white/50 uppercase tracking-widest mt-1">Medals & Custom Castings</p>
-              </div>
-            </Link>
+             {/* 6 Curated Cards Grid */}
+          <div className="grid grid-cols-1 phablet:grid-cols-2 lg:grid-cols-3 gap-4 mobile-mid:gap-6">
+            {curatedCards.map((card) => (
+              <Link key={card.id} href={card.link} className="relative h-64 sm:h-80 overflow-hidden rounded-2xl group cursor-pointer border border-border block bg-card shadow-sm">
+                <SmartImage
+                  alt={card.title}
+                  src={card.image}
+                  className="w-full h-full"
+                  imgClassName="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                  fallbackIcon={<Trophy className="w-16 h-16 text-primary/40 stroke-[1.5]" />}
+                />
+                <div className="absolute inset-0 bg-background/30 group-hover:bg-background/10 transition-colors" />
+                <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8 bg-card/90 backdrop-blur-md border-t border-border rounded-b-2xl">
+                  <h4 className="text-lg sm:text-xl font-display text-foreground">{card.title}</h4>
+                  <p className="text-[10px] text-muted-foreground uppercase tracking-widest mt-1">Explore Range</p>
+                </div>
+              </Link>
+            ))}
           </div>
         </div>
       </section>
       {/* END: CuratedRanges */}
 
       {/* BEGIN: FeaturesSection */}
-      <section className="section-padding bg-black" data-purpose="features">
+      <section className="section-padding bg-card border-y border-border" data-purpose="features">
         <div className="container-custom">
           <div className="mb-12 sm:mb-16 text-center md:text-left">
-            <p className="text-[#f2ca50] uppercase tracking-[0.2em] text-[10px] font-semibold mb-3">Why Choose Atelier</p>
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-light text-white">
+            <p className="text-primary uppercase tracking-[0.2em] text-[10px] font-semibold mb-3">Why Choose Atelier</p>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-display font-light text-foreground">
               Craft you can trust, timelines <br className="hidden md:block" />you can plan.
             </h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 md:gap-12">
             
             <div className="flex items-start group">
-              <div className="mr-6 sm:mr-8 text-[#2563eb] group-hover:text-[#f2ca50] transition-colors duration-500 flex-shrink-0">
+              <div className="mr-6 sm:mr-8 text-primary group-hover:text-gold transition-colors duration-500 flex-shrink-0">
                 <span className="material-symbols-outlined text-3xl sm:text-4xl">verified</span>
               </div>
               <div>
-                <h4 className="text-base sm:text-lg font-display text-white mb-2 sm:mb-3 uppercase tracking-wide">Premium Quality</h4>
-                <p className="text-white/40 text-xs sm:text-sm leading-relaxed">Hand-selected materials and rigorous quality checks for every piece from our atelier.</p>
+                <h4 className="text-base sm:text-lg font-display text-foreground mb-2 sm:mb-3 uppercase tracking-wide">Premium Quality</h4>
+                <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">Hand-selected materials and rigorous quality checks for every piece from our atelier.</p>
               </div>
             </div>
 
             <div className="flex items-start group">
-              <div className="mr-6 sm:mr-8 text-[#2563eb] group-hover:text-[#f2ca50] transition-colors duration-500 flex-shrink-0">
+              <div className="mr-6 sm:mr-8 text-primary group-hover:text-gold transition-colors duration-500 flex-shrink-0">
                 <span className="material-symbols-outlined text-3xl sm:text-4xl">bolt</span>
               </div>
               <div>
-                <h4 className="text-base sm:text-lg font-display text-white mb-2 sm:mb-3 uppercase tracking-wide">Fast Delivery</h4>
-                <p className="text-white/40 text-xs sm:text-sm leading-relaxed">Enterprise-grade logistics with express shipping options available worldwide.</p>
+                <h4 className="text-base sm:text-lg font-display text-foreground mb-2 sm:mb-3 uppercase tracking-wide">Fast Delivery</h4>
+                <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">Enterprise-grade logistics with express shipping options available worldwide.</p>
               </div>
             </div>
 
             <div className="flex items-start group">
-              <div className="mr-6 sm:mr-8 text-[#2563eb] group-hover:text-[#f2ca50] transition-colors duration-500 flex-shrink-0">
+              <div className="mr-6 sm:mr-8 text-primary group-hover:text-gold transition-colors duration-500 flex-shrink-0">
                 <span className="material-symbols-outlined text-3xl sm:text-4xl">groups</span>
               </div>
               <div>
-                <h4 className="text-base sm:text-lg font-display text-white mb-2 sm:mb-3 uppercase tracking-wide">Bulk Solutions</h4>
-                <p className="text-white/40 text-xs sm:text-sm leading-relaxed">Scalable production systems for corporate events and international tournaments.</p>
+                <h4 className="text-base sm:text-lg font-display text-foreground mb-2 sm:mb-3 uppercase tracking-wide">Bulk Solutions</h4>
+                <p className="text-muted-foreground text-xs sm:text-sm leading-relaxed">Scalable production systems for corporate events and international tournaments.</p>
               </div>
             </div>
 
@@ -432,18 +362,18 @@ export default async function HomePage() {
       {/* END: FeaturesSection */}
 
       {/* BEGIN: TestimonialSection */}
-      <section className="section-padding bg-[#0a0a0a] text-white" data-purpose="testimonials">
+      <section className="section-padding bg-background text-foreground" data-purpose="testimonials">
         <div className="container-custom text-center">
-          <p className="text-[#f2ca50] uppercase tracking-[0.2em] text-[10px] font-semibold mb-3">Testimonials</p>
+          <p className="text-primary uppercase tracking-[0.2em] text-[10px] font-semibold mb-3">Testimonials</p>
           <h2 className="text-3xl sm:text-4xl font-display font-light mb-12 sm:mb-16">Kind words from our clients.</h2>
-          <div className="max-w-4xl mx-auto premium-glass p-8 sm:p-12 md:p-16 rounded-3xl relative">
-            <span className="absolute top-4 left-6 sm:top-8 sm:left-12 text-6xl sm:text-8xl text-[#f2ca50]/10 font-serif leading-none">“</span>
-            <blockquote className="text-lg sm:text-xl md:text-2xl font-display italic leading-relaxed text-white/90 relative z-10 mb-8 sm:mb-10">
+          <div className="max-w-4xl mx-auto bg-card border border-border p-8 sm:p-12 md:p-16 rounded-3xl relative shadow-md">
+            <span className="absolute top-4 left-6 sm:top-8 sm:left-12 text-6xl sm:text-8xl text-primary/10 font-serif leading-none">“</span>
+            <blockquote className="text-lg sm:text-xl md:text-2xl font-display italic leading-relaxed text-foreground/90 relative z-10 mb-8 sm:mb-10">
               "Atelier Première has been our partner for six seasons. The trophies always arrive on time and the engraving quality is truly world-class. A standard of excellence we rely on."
             </blockquote>
             <div className="flex flex-col items-center">
-              <p className="font-bold uppercase tracking-[0.2em] text-[10px] sm:text-[11px] text-[#f2ca50]">Rohan Deshmukh</p>
-              <p className="text-[9px] sm:text-[10px] text-white/40 uppercase tracking-widest mt-1">Sports Director, Pune Cricket League</p>
+              <p className="font-bold uppercase tracking-[0.2em] text-[10px] sm:text-[11px] text-primary">Rohan Deshmukh</p>
+              <p className="text-[9px] sm:text-[10px] text-muted-foreground uppercase tracking-widest mt-1">Sports Director, Pune Cricket League</p>
             </div>
           </div>
         </div>
@@ -452,21 +382,21 @@ export default async function HomePage() {
 
       {/* BEGIN: CallToActionBanner */}
       <section className="container-custom py-16 sm:py-24" data-purpose="cta-banner">
-        <div className="btn-primary rounded-3xl p-8 sm:p-14 md:p-20 text-white relative overflow-hidden group">
+        <div className="bg-gradient-to-r from-primary via-purple-700 to-primary rounded-3xl p-8 sm:p-14 md:p-20 text-white relative overflow-hidden group shadow-xl">
           <div className="absolute -right-20 -top-20 w-80 h-80 bg-white/10 blur-[80px] rounded-full group-hover:scale-110 transition-transform duration-700" />
           <div className="relative z-10">
             <h2 className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-display font-light mb-6 sm:mb-8 leading-tight">
               Planning an event? Let's craft <br className="hidden sm:inline" />the perfect award.
             </h2>
-            <p className="text-white/80 max-w-xl mb-8 sm:mb-12 text-sm sm:text-base md:text-lg font-sans">
+            <p className="text-white/90 max-w-xl mb-8 sm:mb-12 text-sm sm:text-base md:text-lg font-sans">
               Send your requirements and our executive team will return a bespoke proposal within 24 hours.
             </p>
             <div className="flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-10">
-              <Link href="/contact" className="bg-white text-[#2563eb] px-8 sm:px-12 py-4 font-bold rounded-full hover:bg-white/90 transition-all uppercase tracking-widest text-xs inline-block text-center w-full sm:w-auto">
+              <Link href="/contact" className="btn-group-2 px-8 sm:px-12 py-4 font-bold rounded-full transition-all uppercase tracking-widest text-xs inline-block text-center w-full sm:w-auto shadow-md">
                 Send Inquiry
               </Link>
               <div className="flex flex-col gap-1">
-                <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-white/60">Direct Atelier Line</span>
+                <span className="text-[10px] uppercase font-bold tracking-[0.2em] text-white/80">Direct Atelier Line</span>
                 <span className="text-xl sm:text-2xl font-display font-light">{phone}</span>
               </div>
             </div>

@@ -4,6 +4,7 @@ import { themes, productThemes } from "@/db/schema";
 import { updateThemeSchema } from "@/lib/validations";
 import { generateSlug } from "@/lib/utils/slug";
 import { successResponse, errorResponse } from "@/lib/utils/api-response";
+import { executeWithVaultAuth } from "@/lib/db/vault-session";
 import { eq, count } from "drizzle-orm";
 
 interface Params {
@@ -81,7 +82,9 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       );
     }
 
-    await db.delete(themes).where(eq(themes.id, id));
+    await executeWithVaultAuth(async () => {
+      await db.delete(themes).where(eq(themes.id, id));
+    });
     return successResponse(null, "Theme deleted successfully");
   } catch (error: any) {
     return errorResponse("Failed to delete theme", 500, error.message);

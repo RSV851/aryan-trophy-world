@@ -18,6 +18,15 @@ export async function POST(request: NextRequest) {
     const data = parsed.data;
 
     const createdInquiry = await db.transaction(async (tx) => {
+      // Create a clear summary of all attached SKUs and quantities for Admin CMS viewing
+      let formattedMessage = data.message;
+      if (data.products && data.products.length > 0) {
+        const skuDetails = data.products
+          .map((p) => `${p.name || "Trophy"} (SKU: ${p.sku || p.productId}, Qty: ${p.quantity})`)
+          .join(" | ");
+        formattedMessage = `[Attached Quotation SKUs: ${skuDetails}]\n\n${data.message}`;
+      }
+
       // 1. Insert core inquiry info
       const [newInquiry] = await tx
         .insert(inquiries)
@@ -27,19 +36,24 @@ export async function POST(request: NextRequest) {
           email: data.email,
           phone: data.phone,
           city: data.city || null,
-          message: data.message,
+          message: formattedMessage,
           status: "new",
         })
         .returning();
 
-      // 2. Insert linked product items with quantities
-      await tx.insert(inquiryProducts).values(
-        data.products.map((p) => ({
-          inquiryId: newInquiry.id,
-          productId: p.productId,
-          quantity: p.quantity,
-        }))
+      // 2. Safely insert linked database items (only valid UUIDs that exist in PostgreSQL schema)
+      const validDbProducts = data.products.filter((p) =>
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(p.productId)
       );
+      if (validDbProducts.length > 0) {
+        await tx.insert(inquiryProducts).values(
+          validDbProducts.map((p) => ({
+            inquiryId: newInquiry.id,
+            productId: p.productId,
+            quantity: p.quantity,
+          }))
+        );
+      }
 
       return newInquiry;
     });

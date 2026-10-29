@@ -4,6 +4,7 @@ import { collections, productCollections } from "@/db/schema";
 import { updateCollectionSchema } from "@/lib/validations";
 import { generateSlug } from "@/lib/utils/slug";
 import { successResponse, errorResponse } from "@/lib/utils/api-response";
+import { executeWithVaultAuth } from "@/lib/db/vault-session";
 import { eq, count } from "drizzle-orm";
 
 interface Params {
@@ -40,6 +41,10 @@ export async function PUT(request: NextRequest, { params }: Params) {
     const [existing] = await db.select().from(collections).where(eq(collections.id, id)).limit(1);
     if (!existing) return errorResponse("Collection not found", 404);
 
+    if (existing.slug === "best-sellers" || existing.slug === "featured") {
+      return errorResponse(`Protected system collection '${existing.name}' cannot be edited.`, 400);
+    }
+
     const data = parsed.data;
     const updateData: Partial<typeof collections.$inferInsert> = { updatedAt: new Date() };
 
@@ -68,6 +73,10 @@ export async function DELETE(request: NextRequest, { params }: Params) {
     const [item] = await db.select().from(collections).where(eq(collections.id, id)).limit(1);
     if (!item) return errorResponse("Collection not found", 404);
 
+    if (item.slug === "best-sellers" || item.slug === "featured") {
+      return errorResponse(`Protected system collection '${item.name}' is protected and cannot be deleted.`, 400);
+    }
+
     // Check dependent products via product_collections junction
     const countResult = await db
       .select({ count: count() })
@@ -82,7 +91,9 @@ export async function DELETE(request: NextRequest, { params }: Params) {
       );
     }
 
-    await db.delete(collections).where(eq(collections.id, id));
+    await executeWithVaultAuth(async () => {
+      await db.delete(collections).where(eq(collections.id, id));
+    });
     return successResponse(null, "Collection deleted successfully");
   } catch (error: any) {
     return errorResponse("Failed to delete collection", 500, error.message);

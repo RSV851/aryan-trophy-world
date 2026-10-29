@@ -1,9 +1,12 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { SmartImage } from '@/components/ui/smart-image';
 import { useUIStore } from '@/stores/ui-store';
+import { useSettingsStore } from '@/stores/settings-store';
 import {
   LayoutDashboard,
   Trophy,
@@ -22,7 +25,8 @@ import {
   Palette,
   Sparkles,
   Bookmark,
-  Shapes as ShapesIcon
+  Shapes as ShapesIcon,
+  Bell,
 } from 'lucide-react';
 
 interface NavItem {
@@ -49,15 +53,34 @@ const navItems: NavItem[] = [
       { title: 'Collections', href: '/admin/collections', icon: Bookmark },
     ],
   },
-  { title: 'Media Library', href: '/admin/media', icon: ImageIcon },
   { title: 'Site Settings', href: '/admin/settings', icon: Settings },
   { title: 'Business Profile', href: '/admin/profile', icon: UserCheck },
+  { title: 'System Notifications', href: '/admin/notifications', icon: Bell },
 ];
 
 export function AdminSidebar() {
   const pathname = usePathname();
   const { isSidebarOpen, setSidebarOpen } = useUIStore();
   const [openAccordion, setOpenAccordion] = useState<string | null>('Master Data');
+  const liveSettings = useSettingsStore((s) => s.settingsMap);
+  const fetchSettings = useSettingsStore((s) => s.fetchSettings);
+
+  const [siteName, setSiteName] = useState("Aryan's Trophy World");
+  const [logoUrl, setLogoUrl] = useState('');
+
+  useEffect(() => {
+    fetchSettings();
+    fetch('/api/v1/admin/profile', { cache: 'no-store' })
+      .then((r) => r.json())
+      .then((profileJson) => {
+        const profile = profileJson?.data || {};
+        const name = liveSettings.site_name || profile.businessName || "Aryan's Trophy World";
+        const logo = liveSettings.site_logo || '';
+        setSiteName(name);
+        setLogoUrl(logo);
+      })
+      .catch(() => null);
+  }, [fetchSettings, liveSettings]);
 
   const toggleAccordion = (title: string) => {
     setOpenAccordion(openAccordion === title ? null : title);
@@ -72,10 +95,10 @@ export function AdminSidebar() {
 
   return (
     <>
-      {/* Mobile Backdrop */}
+      {/* Mobile Overlay */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/80 z-40 lg:hidden backdrop-blur-xs transition-opacity"
+          className="fixed inset-0 bg-black/70 backdrop-blur-xs z-40 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
@@ -89,15 +112,19 @@ export function AdminSidebar() {
         {/* Brand Header */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-gray-800/80 bg-[#090909]">
           <Link href="/admin" className="flex items-center space-x-3 overflow-hidden">
-            <div className="w-8 h-8 rounded-lg bg-[#C5A55A]/10 border border-[#C5A55A]/50 flex items-center justify-center text-[#C5A55A] shrink-0 shadow-[0_0_15px_rgba(197,165,90,0.2)]">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
+            <SmartImage
+              src={logoUrl}
+              alt="CMS Logo"
+              className="w-8 h-8 rounded-lg bg-[#C5A55A]/10 border border-[#C5A55A]/50 shadow-[0_0_15px_rgba(197,165,90,0.2)] p-0.5"
+              imgClassName="w-full h-full object-contain"
+              fallbackIcon={<Trophy className="w-4 h-4 text-[#C5A55A]" />}
+            />
             <div className="flex flex-col truncate">
               <span className="text-sm font-bold tracking-tight text-white uppercase truncate font-serif">
-                Aryan Trophy
+                {siteName}
               </span>
               <span className="text-[10px] text-[#C5A55A] tracking-wider uppercase font-semibold">
-                CMS Portal
+                Executive CMS
               </span>
             </div>
           </Link>

@@ -11,8 +11,16 @@ if (!connectionString) {
   throw new Error("DATABASE_URL is missing from environment variables");
 }
 
-// Disable prefetch as it is not supported for "Transaction" pool mode
-const client = postgres(connectionString, { prepare: false });
+// Global singleton caching to prevent connection leaks during Next.js dev HMR reloads
+const globalForDb = globalThis as unknown as {
+  conn: ReturnType<typeof postgres> | undefined;
+};
+
+const client =
+  globalForDb.conn ??
+  postgres(connectionString, { prepare: false, max: 3, idle_timeout: 20 });
+
+if (process.env.NODE_ENV !== "production") globalForDb.conn = client;
 
 export const db = drizzle(client, { schema });
 export default db;
